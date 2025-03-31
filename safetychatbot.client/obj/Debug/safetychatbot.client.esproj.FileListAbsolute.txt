@@ -1,1 +1,2 @@
 C:\Users\Pacov\Desktop\SafetyChatbot\safetychatbot.client\obj\Debug\safetychatbot.client.esproj.CoreCompileInputs.cache
+C:\Users\Pacov\Desktop\Campus-Safety-Chatbot\safetychatbot.client\obj\Debug\safetychatbot.client.esproj.CoreCompileInputs.cache

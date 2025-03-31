@@ -7617,11 +7617,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Pacov\\Desktop\\SafetyChatbot\\SafetyChatbot.Server\\SafetyChatbot.Server.csproj",
+      "projectUniqueName": "C:\\Users\\Pacov\\Desktop\\Campus-Safety-Chatbot\\SafetyChatbot.Server\\SafetyChatbot.Server.csproj",
       "projectName": "SafetyChatbot.Server",
-      "projectPath": "C:\\Users\\Pacov\\Desktop\\SafetyChatbot\\SafetyChatbot.Server\\SafetyChatbot.Server.csproj",
+      "projectPath": "C:\\Users\\Pacov\\Desktop\\Campus-Safety-Chatbot\\SafetyChatbot.Server\\SafetyChatbot.Server.csproj",
       "packagesPath": "C:\\Users\\Pacov\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Pacov\\Desktop\\SafetyChatbot\\SafetyChatbot.Server\\obj\\",
+      "outputPath": "C:\\Users\\Pacov\\Desktop\\Campus-Safety-Chatbot\\SafetyChatbot.Server\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
