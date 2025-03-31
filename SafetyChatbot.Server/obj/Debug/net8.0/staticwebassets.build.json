@@ -1,0 +1,24 @@
+{
+  "Version": 1,
+  "Hash": "jb3bKbBZSiQLoRifEB1vWP1o9Noc6cS/gVr4DMoCXdw=",
+  "Source": "SafetyChatbot.Server",
+  "BasePath": "_content/SafetyChatbot.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\Users\\Pacov\\Desktop\\SafetyChatbot\\safetychatbot.client\\safetychatbot.client.esproj",
+      "Version": 2,
+      "Source": "safetychatbot.client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
+    }
+  ],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

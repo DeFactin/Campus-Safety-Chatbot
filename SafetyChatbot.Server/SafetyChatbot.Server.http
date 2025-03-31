@@ -1,0 +1,6 @@
+@SafetyChatbot.Server_HostAddress = http://localhost:5128
+
+GET {{SafetyChatbot.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

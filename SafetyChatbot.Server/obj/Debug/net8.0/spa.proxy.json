@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:51395",
+"RedirectUrl": "",
+"LaunchCommand": "npm run dev",
+"WorkingDirectory": "C:\\Users\\Pacov\\Desktop\\SafetyChatbot\\SafetyChatbot.Server\\..\\safetychatbot.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}
