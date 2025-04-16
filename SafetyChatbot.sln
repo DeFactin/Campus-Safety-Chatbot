@@ -4,13 +4,13 @@ VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "SafetyChatbot.Client", "safetychatbot.client\SafetyChatbot.Client.esproj", "{29C3B731-C004-E76B-726D-7270A492EFCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.Api", "SafetyChatbot.Server\SafetyChatbot.Api.csproj", "{1A7946CB-6CE6-4E72-A790-FCCB020D8520}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.Domain", "SafetyChatbot.Domain\SafetyChatbot.Domain.csproj", "{1C69CE97-BA5B-46D2-B0F5-F88857BE3CD9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.Application", "SafetyChatbot.Application\SafetyChatbot.Application.csproj", "{6B2083CF-05E1-48E1-B5B5-849E25254A34}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.Infrastructure", "SafetyChatbot.Infrastructure\SafetyChatbot.Infrastructure.csproj", "{27FE5A8E-60AD-4F39-9BD8-A4EC2D22C088}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.Api", "SafetyChatbot.Api\SafetyChatbot.Api.csproj", "{E2B10931-3974-7CFB-5768-7917EE2AACD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +24,6 @@ Global
 		{29C3B731-C004-E76B-726D-7270A492EFCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29C3B731-C004-E76B-726D-7270A492EFCF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29C3B731-C004-E76B-726D-7270A492EFCF}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{1A7946CB-6CE6-4E72-A790-FCCB020D8520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A7946CB-6CE6-4E72-A790-FCCB020D8520}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A7946CB-6CE6-4E72-A790-FCCB020D8520}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A7946CB-6CE6-4E72-A790-FCCB020D8520}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C69CE97-BA5B-46D2-B0F5-F88857BE3CD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C69CE97-BA5B-46D2-B0F5-F88857BE3CD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C69CE97-BA5B-46D2-B0F5-F88857BE3CD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -40,6 +36,10 @@ Global
 		{27FE5A8E-60AD-4F39-9BD8-A4EC2D22C088}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27FE5A8E-60AD-4F39-9BD8-A4EC2D22C088}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27FE5A8E-60AD-4F39-9BD8-A4EC2D22C088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2B10931-3974-7CFB-5768-7917EE2AACD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2B10931-3974-7CFB-5768-7917EE2AACD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2B10931-3974-7CFB-5768-7917EE2AACD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2B10931-3974-7CFB-5768-7917EE2AACD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
