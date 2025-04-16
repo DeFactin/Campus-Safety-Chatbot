@@ -4,7 +4,7 @@ VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "SafetyChatbot.Client", "safetychatbot.client\SafetyChatbot.Client.esproj", "{29C3B731-C004-E76B-726D-7270A492EFCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.API", "SafetyChatbot.Server\SafetyChatbot.API.csproj", "{1A7946CB-6CE6-4E72-A790-FCCB020D8520}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.Api", "SafetyChatbot.Server\SafetyChatbot.Api.csproj", "{1A7946CB-6CE6-4E72-A790-FCCB020D8520}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafetyChatbot.Domain", "SafetyChatbot.Domain\SafetyChatbot.Domain.csproj", "{1C69CE97-BA5B-46D2-B0F5-F88857BE3CD9}"
 EndProject
