@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\SafetyChatbot.Server.props" />
-</Project>

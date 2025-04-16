@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\safetychatbot.client\safetychatbot.client.esproj">
+    <ProjectReference Include="..\safetychatbot.client\SafetyChatbot.Client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>

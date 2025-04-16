@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\SafetyChatbot.Server.props" />
-</Project>
