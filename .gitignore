@@ -482,3 +482,24 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# React/Node.js specific ignores
+safetychatbot.client/node_modules/
+safetychatbot.client/dist/
+safetychatbot.client/.env
+safetychatbot.client/.env.local
+safetychatbot.client/.env*.local
+safetychatbot.client/npm-debug.log*
+safetychatbot.client/yarn-debug.log*
+safetychatbot.client/yarn-error.log*
+safetychatbot.client/.pnpm-debug.log*
+safetychatbot.client/.DS_Store
+
+# Build files
+safetychatbot.client/.eslintcache
+safetychatbot.client/.vscode/
+safetychatbot.client/coverage/
+
+# Vite specific
+safetychatbot.client/.vite/
+safetychatbot.client/*.local
