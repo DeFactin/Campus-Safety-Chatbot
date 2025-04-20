@@ -1,19 +1,18 @@
-// App.tsx
-
 import React, { useEffect, useState } from 'react'
 import './App.css'
-
-interface Guideline {
-    id: number
-    title: string
-    description: string
-}
+import { getGuidelines} from './services/ApiService'  // Importing from ApiService
 
 function App() {
+    interface Guideline {
+        id: number
+        title: string
+        description: string
+    }
+
     const [guidelines, setGuidelines] = useState<Guideline[]>([])
 
     useEffect(() => {
-        fetchGuidelines()
+        loadGuidelines()
     }, [])
 
     const contents =
@@ -53,14 +52,13 @@ function App() {
         </div>
     )
 
-    async function fetchGuidelines() {
+    // Load guidelines using the API service
+    async function loadGuidelines() {
         try {
-            const response = await fetch('/api/guidelines')
-            if (!response.ok) throw new Error('Network response was not ok')
-            const data: Guideline[] = await response.json()
+            const data = await getGuidelines()  // Call the getGuidelines function
             setGuidelines(data)
         } catch (error) {
-            console.error('Failed to fetch guidelines:', error)
+            console.error('Failed to load guidelines:', error)
         }
     }
 }
