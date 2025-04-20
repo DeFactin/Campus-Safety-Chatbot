@@ -59,6 +59,7 @@ const theme = createTheme({
         h4: {
             fontFamily: '"Jersey 10", sans-serif',
             fontWeight: 400,
+            fontSize: '80px'
         },
     },
 });
