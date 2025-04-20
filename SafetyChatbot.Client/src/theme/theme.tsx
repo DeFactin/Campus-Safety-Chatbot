@@ -30,7 +30,7 @@ const theme = createTheme({
             main: '#EDFC69',
         },
         resolved: {
-            main: '#7CFB89', // Fixed extra "#"
+            main: '#7CFB89', 
         },
         progressing: {
             main: '#F0A54A',
@@ -47,7 +47,7 @@ const theme = createTheme({
             fontSize: '36px',
         },
         h2: {
-            fontFamily: '"Jersey 20", sans-serif', // Fixed hyphen to camelCase
+            fontFamily: '"Jersey 20", sans-serif', 
             fontWeight: 400,
             fontSize: '24px',
         },
