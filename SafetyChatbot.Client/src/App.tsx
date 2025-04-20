@@ -4,7 +4,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme/theme';
 import { getGuidelines } from './services/ApiService'  // Importing from ApiService
 import { Table, TableHead, TableBody, TableRow, TableCell, Typography, CircularProgress, Button } from '@mui/material'
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 function App() {
     interface Guideline {
         id: number
@@ -46,7 +47,14 @@ function App() {
 
     return (
         <div>
+
             <ThemeProvider theme={theme}>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        {/* Add other routes later */}
+                    </Routes>
+                </Router>
             <Typography variant="h1">
                 Safety Guidelines
             </Typography>
