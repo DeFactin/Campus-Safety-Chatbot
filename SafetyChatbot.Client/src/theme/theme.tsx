@@ -44,15 +44,17 @@ const theme = createTheme({
         h1: {
             fontFamily: '"Jersey 25", sans-serif',
             fontWeight: 400,
-            fontSize: '2.5 rem',
+            fontSize: '36px',
         },
         h2: {
             fontFamily: '"Jersey 20", sans-serif', // Fixed hyphen to camelCase
             fontWeight: 400,
+            fontSize: '24px',
         },
         h3: {
             fontFamily: '"Jersey 15", sans-serif',
             fontWeight: 400,
+            fontSize: '32px',
         },
         h4: {
             fontFamily: '"Jersey 10", sans-serif',
