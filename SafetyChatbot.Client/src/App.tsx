@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './theme/theme';
 import { getGuidelines } from './services/ApiService'  // Importing from ApiService
-import { Table, TableHead, TableBody, TableRow, TableCell, Typography, CircularProgress } from '@mui/material'
+import { Table, TableHead, TableBody, TableRow, TableCell, Typography, CircularProgress, Button } from '@mui/material'
 
 function App() {
     interface Guideline {
@@ -44,13 +46,16 @@ function App() {
 
     return (
         <div>
-            <Typography variant="h4" gutterBottom>
+            <ThemeProvider theme={theme}>
+            <Typography font="h1">
                 Safety Guidelines
             </Typography>
             <Typography paragraph>
                 This component demonstrates fetching safety guidelines from the backend.
             </Typography>
-            {contents}
+                {contents}
+                <Button variant="contained" color="golden">Click me</Button>
+            </ThemeProvider>
         </div>
     )
 
