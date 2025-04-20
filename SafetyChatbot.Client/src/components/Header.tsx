@@ -33,7 +33,6 @@ const Header = () => {
                     }}
                 />
 
-                {/* University Title */}
                 <Box>
                     <Typography
                         variant="h2"

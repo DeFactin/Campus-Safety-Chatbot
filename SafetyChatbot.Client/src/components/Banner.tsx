@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Banner = () => {
     return (
         <Box sx={{ bgcolor: 'golden.main', color: 'white', py: 1, px: 4 }}>
-            <Typography>Real-time alerts, emergency guidance, and secure incident reporting at your fingertips.</Typography>
+            <Typography variant="h2" > Real-time alerts, emergency guidance, and secure incident reporting at your fingertips.</Typography>
             
         </Box>
     );
