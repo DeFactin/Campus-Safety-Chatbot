@@ -1,0 +1,46 @@
+:root {
+:root {
+    /* Colors */
+    --bg-blue1: #213D73;
+    --bg-blue2: #202453;
+    --golden: #E9AD35;
+    --primary-red: #EB4545;
+    --font-blue: #2D3587;
+    /* Severity Colors */
+    --severity-red: #F62323;
+    --severity-orange: #F88539;
+    --severity-green: #EDFC69;
+    /* Status Colors */
+    --pending: #EDFC69;
+    --resolved: #7CFB89;
+    --progressing: #F0A54A;
+    /* Fonts */
+    --font-jersey: "Jersey 10", "Jersey 15", "Jersey 20", "Jersey 25", sans-serif;
+    --font-grotesk: "Hanken Grotesk", sans-serif;
+}
+
+/* Typography */
+h1 {
+    font-family: "Jersey 25", sans-serif;
+    font-weight: 400;
+}
+
+h2 {
+    font-family: "Jersey 20", sans-serif;
+    font-weight: 400;
+}
+
+h3 {
+    font-family: "Jersey 15", sans-serif;
+    font-weight: 400;
+}
+
+h4 {
+    font-family: "Jersey 10", sans-serif;
+    font-weight: 400;
+}
+
+.report-font {
+    font-family: var(--font-grotesk);
+    font-weight: 500;
+}
