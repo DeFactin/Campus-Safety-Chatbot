@@ -7,6 +7,7 @@ import { Table, TableHead, TableBody, TableRow, TableCell, Typography, CircularP
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SafetyGuidelinesPage from './pages/SafetyGuidelinesPage';
 import HomePage from './pages/HomePage';
+import AdminPage from './pages/AdminPage';
 
 const App = () => {   
     return (
@@ -15,6 +16,7 @@ const App = () => {
                 <Router>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
+                        <Route path="/admin" element={<AdminPage />} />
                         <Route path="/safety-guidelines" element={<SafetyGuidelinesPage />} />
                         
                     </Routes>
