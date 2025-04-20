@@ -66,13 +66,16 @@ const Header = () => {
                 }}
             >
                 {/* Navigation Links */}
-                {['Home', 'Safety Regulations'].map((item) => (
+                {['Home', 'Safety Guidelines'].map((item) => (
                     <Box
                         key={item}
+                        component={Link} // Makes the whole Box a link
+                        to={item === 'Home' ? '/' : '/safety-guidelines'} // Routes
                         sx={{
                             p: 2,
                             borderRadius: 1,
                             textAlign: 'center',
+                            textDecoration: 'none', // Removes underline
                             '&:hover': {
                                 backgroundColor: '#f5f5f5',
                                 cursor: 'pointer'
