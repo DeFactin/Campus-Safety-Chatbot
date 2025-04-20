@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './App.css'
-import { getGuidelines} from './services/ApiService'  // Importing from ApiService
+import { getGuidelines } from './services/ApiService'  // Importing from ApiService
+import { Table, TableHead, TableBody, TableRow, TableCell, Typography, CircularProgress } from '@mui/material'
 
 function App() {
     interface Guideline {
@@ -10,44 +11,45 @@ function App() {
     }
 
     const [guidelines, setGuidelines] = useState<Guideline[]>([])
+    const [loading, setLoading] = useState<boolean>(true)
 
     useEffect(() => {
         loadGuidelines()
     }, [])
 
-    const contents =
-        guidelines.length === 0 ? (
-            <p>
-                <em>Loading... Please ensure the ASP.NET backend is running.</em>
-            </p>
-        ) : (
-            <table className="table table-striped" aria-labelledby="tableLabel">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {guidelines.map((guideline) => (
-                        <tr key={guideline.id}>
-                            <td>{guideline.id}</td>
-                            <td>{guideline.title}</td>
-                            <td>{guideline.description}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        )
+    const contents = loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+            <CircularProgress />
+        </div>
+    ) : (
+        <Table className="table" aria-labelledby="tableLabel">
+            <TableHead>
+                <TableRow>
+                    <TableCell >ID</TableCell>
+                    <TableCell>Title</TableCell>
+                    <TableCell>Description</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {guidelines.map((guideline) => (
+                    <TableRow key={guideline.id}>
+                        <TableCell>{guideline.id}</TableCell>
+                        <TableCell>{guideline.title}</TableCell>
+                        <TableCell>{guideline.description}</TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    )
 
     return (
         <div>
-            <h1 id="tableLabel">Safety Guidelines</h1>
-            <p>
-                This component demonstrates fetching safety guidelines from the
-                backend.
-            </p>
+            <Typography variant="h4" gutterBottom>
+                Safety Guidelines
+            </Typography>
+            <Typography paragraph>
+                This component demonstrates fetching safety guidelines from the backend.
+            </Typography>
             {contents}
         </div>
     )
@@ -57,8 +59,10 @@ function App() {
         try {
             const data = await getGuidelines()  // Call the getGuidelines function
             setGuidelines(data)
+            setLoading(false)  // Set loading to false once the data is fetched
         } catch (error) {
             console.error('Failed to load guidelines:', error)
+            setLoading(false)  // Stop loading even if there's an error
         }
     }
 }
