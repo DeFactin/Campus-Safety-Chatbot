@@ -47,7 +47,7 @@ function App() {
     return (
         <div>
             <ThemeProvider theme={theme}>
-            <Typography font="h1">
+            <Typography variant="h1">
                 Safety Guidelines
             </Typography>
             <Typography paragraph>
