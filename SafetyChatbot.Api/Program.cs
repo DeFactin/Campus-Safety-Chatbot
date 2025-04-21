@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SafetyChatbot.Api.MappingProfiles;
+using SafetyChatbot.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +12,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-
-
+builder.Services.AddAutoMapper(typeof(ApplicationMappings));
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IIncidentReportRepository, IncidentReportSqlRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SafetyChatbot.Models;
@@ -20,13 +21,12 @@ public class SafetyRegulationsController : ControllerBase
     }
 
     [HttpPost]
-    [HttpPost]
     public async Task<ActionResult<SafetyRegulation>> Post([FromBody] SafetyRegulation regulation)
     {
         regulation.Id = 0; // Ensure ID is not manually set
         _context.SafetyRegulations.Add(regulation);
         await _context.SaveChangesAsync();
-
+        
         return Ok(regulation);
     }
 
