@@ -12,19 +12,20 @@ const HomePage = () => {
 
             <Box
                 sx={{
-                    marginX: '170px',
+                    marginX: { xs: 2, sm: 4, md: 8, lg: '170px' }, // Responsive margins
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    minHeight: '100vh',
-                    px: 4
+                    minHeight: { xs: '50vh', md: '100vh' }, // Smaller height on mobile
+                    px: { xs: 1, sm: 2, md: 4 }, // Responsive padding
+                    py: { xs: 4, md: 0 } // Vertical padding on mobile
                 }}
             >
                 {/* Main container */}
                 <Box
                     sx={{
                         display: 'flex',
-                        gap: 8,
+                        gap: { xs: 4, md: 8 }, // Smaller gap on mobile
                         maxWidth: '1200px',
                         width: '100%',
                         flexDirection: { xs: 'column', md: 'row' }
@@ -35,8 +36,8 @@ const HomePage = () => {
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: 4,
-                        textAlign: 'left',
+                        gap: { xs: 2, md: 4 }, // Smaller gap on mobile
+                        textAlign: { xs: 'center', md: 'left' }, // Centered on mobile
                         justifyContent: 'center'
                     }}>
                         {/* Text Box 1 */}
@@ -46,7 +47,9 @@ const HomePage = () => {
                                 sx={{
                                     fontFamily: '"Jersey 25"',
                                     color: 'white',
-                                    lineHeight: 1.2
+                                    lineHeight: 1.2,
+                                    fontSize: {
+                                        xs: '1.5rem', sm: '1.75rem', md: '2rem', lg: '80px' } // Responsive font
                                 }}
                             >
                                 Welcome to the IUS Campus Safety Chatbot
@@ -60,7 +63,8 @@ const HomePage = () => {
                                 sx={{
                                     fontFamily: '"Jersey 20"',
                                     color: 'white',
-                                    lineHeight: 1.5
+                                    lineHeight: 1.5,
+                                    fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem', lg: '36px' } // Responsive font
                                 }}
                             >
                                 Your 24/7 available companion for emergency guidance!
@@ -73,7 +77,8 @@ const HomePage = () => {
                         flex: 1,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: { xs: 'center', md: 'flex-end' }
+                        justifyContent: { xs: 'center', md: 'flex-end' },
+                        mt: { xs: 2, md: 0 } // Margin top on mobile only
                     }}>
                         <Button
                             variant="contained"
@@ -83,10 +88,11 @@ const HomePage = () => {
                                 bgcolor: 'primary_red.main',
                                 fontFamily: '"Jersey 25"',
                                 color: 'white',
-                                fontSize: '1.5rem',
-                                py: 3,
-                                px: 6,
+                                fontSize: { xs: '1.25rem', md: '1.5rem' }, // Responsive font
+                                py: { xs: 2, md: 3 }, // Responsive padding
+                                px: { xs: 4, md: 6 }, // Responsive padding
                                 borderRadius: 2,
+                                width: { xs: '100%', sm: 'auto' }, // Full width on mobile
                                 '&:hover': {
                                     bgcolor: 'severity_red.main',
                                     transform: 'scale(1.02)'
@@ -99,7 +105,7 @@ const HomePage = () => {
                                 sx={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: 2
+                                    gap: { xs: 1, md: 2 } // Smaller gap on mobile
                                 }}
                             >
                                 <Box
@@ -107,7 +113,7 @@ const HomePage = () => {
                                     src="/bot.png"
                                     alt="Chatbot Icon"
                                     sx={{
-                                        height: '32px',
+                                        height: { xs: '24px', md: '32px' }, // Smaller icon on mobile
                                         width: 'auto',
                                         filter: 'brightness(0) invert(1)'
                                     }}
