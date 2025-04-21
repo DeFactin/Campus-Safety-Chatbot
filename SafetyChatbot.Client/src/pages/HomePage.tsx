@@ -113,9 +113,9 @@ const HomePage = () => {
                                     src="/bot.png"
                                     alt="Chatbot Icon"
                                     sx={{
-                                        height: { xs: '24px', md: '32px' }, // Smaller icon on mobile
+                                        height: { xs: '24px', md: '36px', lg:'40px' }, // Smaller icon on mobile
                                         width: 'auto',
-                                        filter: 'brightness(0) invert(1)'
+                                       
                                     }}
                                 />
                                 CHAT NOW
