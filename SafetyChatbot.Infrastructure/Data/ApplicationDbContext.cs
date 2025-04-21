@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SafetyChatbot.Domain.Models;
 using SafetyChatbot.Models;
 
 public class ApplicationDbContext : DbContext
@@ -9,4 +10,6 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<SafetyRegulation> SafetyRegulations { get; set; }
+
+    public DbSet<IncidentReport> IncidentReports { get; set; } 
 }
