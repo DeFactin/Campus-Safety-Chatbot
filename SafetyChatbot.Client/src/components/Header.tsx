@@ -96,7 +96,7 @@ const Header = () => {
                         onClick={toggleDrawer(true)}
                         sx={{
                             color: 'blue1.main',
-                            pl: 5,
+                            ml: 5,
                             
                         }}
                     >
