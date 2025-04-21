@@ -17,7 +17,7 @@ const AdminPage = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     minHeight: '100vh',
-                    p: 2,
+                    p: 2, 
                 }}
             >
                 {/* Main white box */}
@@ -46,7 +46,7 @@ const AdminPage = () => {
                             sx={{
                                 color: 'white',
                                 fontFamily: '"Jersey 25"',
-
+                            
                             }}
                         >
                             Admin Dashboard
@@ -60,7 +60,7 @@ const AdminPage = () => {
                     </Box>
                 </Box>
             </Box>
-
+            
         </Box>
     );
 };
