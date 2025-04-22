@@ -303,15 +303,17 @@ const Header = () => {
                                 </ListItem>
                             </>
                         ) : (
-                            <ListItem
-                                component="button"
-                                onClick={handleLogout}
-                                sx={{
-                                    '&:hover': {
-                                        backgroundColor: '#f5f5f5'
-                                    }
-                                }}
-                            >
+                                <ListItem
+                                    component="a"
+                                    href="https://localhost:7084/signout"
+                                    onClick={() => localStorage.removeItem('token')}
+                                    sx={{
+                                        '&:hover': {
+                                            backgroundColor: '#f5f5f5'
+                                        }
+                                    }}
+                                >
+
                                 <ListItemText
                                     primary="Log Out"
                                     primaryTypographyProps={{
