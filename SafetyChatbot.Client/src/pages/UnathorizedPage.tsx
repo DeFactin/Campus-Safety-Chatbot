@@ -17,7 +17,7 @@ const UnauthorizedPage = () => {
             }}
         >
             <Typography variant="h3" sx={{ color: 'white' }}>
-                You have no access to this page.
+                You have no access to this page. Please log in.
             </Typography>
             <Button
                 variant="contained"

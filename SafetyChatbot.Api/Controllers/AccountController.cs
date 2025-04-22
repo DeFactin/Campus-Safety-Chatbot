@@ -38,14 +38,14 @@ namespace SafetyChatbot.Api.Controllers
             }
 
             var name = User.FindFirst("name")?.Value ?? "Unknown";
-
-            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? "noemail@example.com";
-            var role = "User";
+            var role = User.FindFirst(ClaimTypes.Role)?.Value
+                    ?? User.FindFirst("role")?.Value
+                    ?? User.FindFirst("roles")?.Value
+                    ?? "User";
 
             var tokenClaims = new[]
             {
         new Claim("name", name),
-        new Claim("email", email),
         new Claim("role", role)
     };
 
@@ -64,8 +64,6 @@ namespace SafetyChatbot.Api.Controllers
 
             return Redirect($"https://localhost:51395/?token={jwt}");
         }
-
-
 
 
         [HttpGet("/signout")]

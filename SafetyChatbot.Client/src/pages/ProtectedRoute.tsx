@@ -9,10 +9,10 @@ type Props = {
 };
 
 type DecodedToken = {
-    name: string;
-    email: string;
-    role: string;
+    name?: string;
+    email?: string;
     exp: number;
+    [key: string]: any; // omogućava fleksibilan pristup claim-ovima
 };
 
 const ProtectedRoute: React.FC<Props> = ({ children, requiredRole }) => {
@@ -27,23 +27,39 @@ const ProtectedRoute: React.FC<Props> = ({ children, requiredRole }) => {
 
     try {
         const decoded: DecodedToken = jwtDecode(token);
-
         const isExpired = decoded.exp * 1000 < Date.now();
+
         if (isExpired) {
             localStorage.removeItem('token');
-            setSnackbarMessage('Session expired. Please log in again.');
+            setSnackbarMessage('Sesija je istekla. Prijavite se ponovo.');
             setOpenSnackbar(true);
             return <Navigate to="/unauthorized" replace />;
         }
 
-        if (decoded.role !== requiredRole && requiredRole !== 'User') {
+        const userRole = decoded["role"];
+
+        if (userRole !== requiredRole && requiredRole !== 'User') {
+            setSnackbarMessage('Nemate ovlasti za pristup ovoj stranici.');
+            setOpenSnackbar(true);
             return <Navigate to="/unauthorized" replace />;
         }
 
-        return children;
+        return (
+            <>
+                {children}
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={4000}
+                    onClose={() => setOpenSnackbar(false)}
+                    message={snackbarMessage}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                />
+            </>
+        );
     } catch (error) {
         console.error('Token nije validan:', error);
-        setSnackbarMessage('Invalid session. Please log in again.');
+        localStorage.removeItem('token');
+        setSnackbarMessage('Sesija nije valjana. Prijavite se ponovo.');
         setOpenSnackbar(true);
         return <Navigate to="/unauthorized" replace />;
     }
