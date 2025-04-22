@@ -3,7 +3,6 @@ import { Box, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Banner from '../components/Banner';
-import React from 'react';
 
 const HomePage = () => {
     return (
