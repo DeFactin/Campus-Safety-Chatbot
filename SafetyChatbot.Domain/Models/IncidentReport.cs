@@ -20,6 +20,9 @@ namespace SafetyChatbot.Domain.Models
         public string IncidentType { get; set; }
 
         [Required]
+        public string Status { get; set; }  // Numeric field for API input
+
+        [Required]
         public string Description { get; set; }
 
         [Required]
@@ -29,15 +32,25 @@ namespace SafetyChatbot.Domain.Models
         public string Location { get; set; }
 
         [Required]
-        public SeverityLevel Severity { get; set; }
+        public SeverityLevel  SeverityCode { get; set; }  // Numeric field for API input
 
+       
 
+        
     }
 
     public enum SeverityLevel
     {
-        Low,
-        Medium,
-        High
+        Low = 0,    
+        Medium = 1, 
+        High = 2    
     }
+
+    /*public enum Status
+    {
+        Pending = 0,    
+        InProgress = 1,  
+        Resolved = 2    
+    }*/
 }
+
