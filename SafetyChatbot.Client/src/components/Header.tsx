@@ -53,9 +53,10 @@ const Header = () => {
             if (storedToken) {
                 try {
                     const decoded: DecodedToken = jwtDecode(storedToken);
-                    const cleanName = decoded.name.split(' ')[0]; 
+                    const cleanName = decoded.name.split(' ')[0];
                     setUsername(cleanName);
                     setRole(decoded.role);
+                    console.log('Decoded token:', decoded);
                 } catch {
                     localStorage.removeItem('token');
                 }
@@ -67,14 +68,10 @@ const Header = () => {
         setDrawerOpen(open);
     };
 
-    const baseNavItems = [
+    const navItems = [
         { name: 'Home', path: '/' },
         { name: 'Safety Guidelines', path: '/safety-guidelines' },
     ];
-
-    const adminNavItem = { name: 'Reports', path: '/admin' };
-
-    const navItems = role === 'Admin' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
     return (
         <Box
@@ -168,6 +165,34 @@ const Header = () => {
                             </Typography>
                         </Box>
                     ))}
+
+                    {role === 'Admin' && (
+                        <Box
+                            component={Link}
+                            to="/admin"
+                            sx={{
+                                p: 2,
+                                borderRadius: 1,
+                                textAlign: 'center',
+                                textDecoration: 'none',
+                                '&:hover': {
+                                    backgroundColor: '#f5f5f5',
+                                    cursor: 'pointer',
+                                },
+                            }}
+                        >
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontFamily: '"Jersey 15"',
+                                    color: 'blue1.main',
+                                }}
+                            >
+                                Reports
+                            </Typography>
+                        </Box>
+                    )}
+
                     {!username ? (
                         <>
                             <Button
@@ -255,26 +280,30 @@ const Header = () => {
                                 />
                             </ListItem>
                         ))}
+
+                        {role === 'Admin' && (
+                            <ListItem
+                                button
+                                component={Link}
+                                to="/admin"
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: '#f5f5f5'
+                                    }
+                                }}
+                            >
+                                <ListItemText
+                                    primary="Reports"
+                                    primaryTypographyProps={{
+                                        fontFamily: '"Jersey 15"',
+                                        color: 'blue1.main'
+                                    }}
+                                />
+                            </ListItem>
+                        )}
+
                         {!username ? (
                             <>
-                                <ListItem
-                                    button
-                                    component={Link}
-                                    to="/register"
-                                    sx={{
-                                        '&:hover': {
-                                            backgroundColor: '#f5f5f5'
-                                        }
-                                    }}
-                                >
-                                    <ListItemText
-                                        primary="Register"
-                                        primaryTypographyProps={{
-                                            fontFamily: '"Jersey 15"',
-                                            color: 'primary_red.main'
-                                        }}
-                                    />
-                                </ListItem>
                                 <ListItem
                                     component="a"
                                     href="https://localhost:7084/signin"
