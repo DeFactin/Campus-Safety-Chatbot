@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
     Box,
     Typography,
@@ -9,9 +9,10 @@ import {
     Drawer,
     List,
     ListItem,
-    ListItemText
+    ListItemText,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import PersonIcon from '@mui/icons-material/Person'; // Ikona korisnika
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
@@ -38,7 +39,7 @@ const Header = () => {
             localStorage.setItem('token', token);
             try {
                 const decoded: DecodedToken = jwtDecode(token);
-                const cleanName = decoded.name.replace(/\s*\(.*?\)\s*$/, '').trim();
+                const cleanName = decoded.name.split(' ')[0];
                 setUsername(cleanName);
             } catch (err) {
                 console.error('Neispravan token:', err);
@@ -50,7 +51,7 @@ const Header = () => {
             if (storedToken) {
                 try {
                     const decoded: DecodedToken = jwtDecode(storedToken);
-                    const cleanName = decoded.name.replace(/\s*\(.*?\)\s*$/, '').trim();
+                    const cleanName = decoded.name.split(' ')[0]; 
                     setUsername(cleanName);
                 } catch {
                     localStorage.removeItem('token');
@@ -203,6 +204,8 @@ const Header = () => {
                         </>
                     ) : (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                {/* Korisničko ime + Ikonica */}
+                            <PersonIcon sx={{ fontSize: 30, color: 'blue1.main' }} /> {/* Ikonica korisnika */}
                             <Typography
                                 variant="h6"
                                 sx={{
@@ -210,8 +213,9 @@ const Header = () => {
                                     color: 'blue1.main',
                                 }}
                             >
-                                Welcome, {username}
+                                {username}
                             </Typography>
+                            
                             <Button
                                 variant="outlined"
                                 onClick={handleLogout}
