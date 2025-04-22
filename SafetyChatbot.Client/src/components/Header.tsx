@@ -64,12 +64,6 @@ const Header = () => {
         setDrawerOpen(open);
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        setUsername(null);
-        window.location.href = '/';
-    };
-
     const navItems = [
         { name: 'Home', path: '/' },
         { name: 'Safety Guidelines', path: '/safety-guidelines' }
@@ -216,22 +210,25 @@ const Header = () => {
                                 {username}
                             </Typography>
                             
-                            <Button
-                                variant="outlined"
-                                onClick={handleLogout}
-                                sx={{
-                                    borderColor: 'primary_red.main',
-                                    color: 'primary_red.main',
-                                    fontFamily: '"Jersey 15"',
-                                    px: 2,
-                                    '&:hover': {
-                                        borderColor: 'severity_red.main',
-                                        color: 'severity_red.main',
-                                    },
-                                }}
-                            >
-                                Log Out
-                            </Button>
+                                <Button
+                                    variant="outlined"
+                                    component="a"
+                                    href="https://localhost:7084/signout"
+                                    onClick={() => localStorage.removeItem('token')}
+                                    sx={{
+                                        borderColor: 'primary_red.main',
+                                        color: 'primary_red.main',
+                                        fontFamily: '"Jersey 15"',
+                                        px: 2,
+                                        '&:hover': {
+                                            borderColor: 'severity_red.main',
+                                            color: 'severity_red.main',
+                                        },
+                                    }}
+                                >
+                                    Log Out
+                                </Button>
+
                         </Box>
                     )}
                 </Box>
