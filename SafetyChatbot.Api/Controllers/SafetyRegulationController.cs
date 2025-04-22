@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.DataProtection.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SafetyChatbot.Models;
@@ -13,7 +14,7 @@ public class SafetyRegulationsController : ControllerBase
     {
         _context = context;
     }
-
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<SafetyRegulation>>> Get()
     {

@@ -1,7 +1,10 @@
+﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SafetyChatbot.Api.MappingProfiles;
 using SafetyChatbot.Infrastructure.Repositories;
+using Microsoft.Identity.Web;
+using System.Security.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddAutoMapper(typeof(ApplicationMappings));
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+
+builder.Services.AddAuthorization();
+
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IIncidentReportRepository, IncidentReportSqlRepository>();
@@ -30,6 +38,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowAll");
