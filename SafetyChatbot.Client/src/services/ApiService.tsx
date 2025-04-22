@@ -18,3 +18,9 @@ export const createGuideline = async (newGuideline: { title: string; description
 }
 
 // Other API calls 
+export const getIncidents = async () => {
+    const response = await api.get('/incidentreports')
+    return response.data
+}
+
+
