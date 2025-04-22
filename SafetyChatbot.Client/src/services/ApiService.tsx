@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create an Axios instance
 const api = axios.create({
-    baseURL: 'https://localhost:7084/api',  // Correct base URL for your backend
+    baseURL: '/api',  // Correct base URL for your backend
 })
 
 // Fetch all safety guidelines
