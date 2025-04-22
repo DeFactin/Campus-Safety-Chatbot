@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import './App.css'
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme/theme';
@@ -7,23 +7,46 @@ import SafetyGuidelinesPage from './pages/SafetyGuidelinesPage';
 import HomePage from './pages/HomePage';
 import AdminPage from './pages/AdminPage';
 import IncidentDetailsPage from './pages/IncidentDetailsPage';
+import ProtectedRoute from './pages/ProtectedRoute';
+import UnauthorizedPage from './pages/UnathorizedPage';  
 
-const App = () => {   
+const App = () => {
     return (
         <div>
             <ThemeProvider theme={theme}>
                 <Router>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/admin" element={<AdminPage />} />
-                        <Route path="/admin/:id" element={<IncidentDetailsPage />} />
-                        <Route path="/safety-guidelines" element={<SafetyGuidelinesPage />} />
-                        
+                        <Route path="/unauthorized" element={<UnauthorizedPage />} /> {}
+                        <Route
+                            path="/safety-guidelines"
+                            element={
+                                <ProtectedRoute requiredRole="User">
+                                    <SafetyGuidelinesPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin"
+                            element={
+                                <ProtectedRoute requiredRole="Admin">
+                                    <AdminPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin/:id"
+                            element={
+                                <ProtectedRoute requiredRole="Admin">
+                                    <IncidentDetailsPage />
+                                </ProtectedRoute>
+                            }
+                        />
                     </Routes>
                 </Router>
             </ThemeProvider>
         </div>
-    )   
-}
+    );
+};
 
-export default App
+export default App;

@@ -28,6 +28,7 @@ const Header = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [username, setUsername] = useState<string | null>(null);
+    const [role, setRole] = useState<string | null>(null);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -41,6 +42,7 @@ const Header = () => {
                 const decoded: DecodedToken = jwtDecode(token);
                 const cleanName = decoded.name.split(' ')[0];
                 setUsername(cleanName);
+                setRole(decoded.role);
             } catch (err) {
                 console.error('Neispravan token:', err);
             }
@@ -53,6 +55,7 @@ const Header = () => {
                     const decoded: DecodedToken = jwtDecode(storedToken);
                     const cleanName = decoded.name.split(' ')[0]; 
                     setUsername(cleanName);
+                    setRole(decoded.role);
                 } catch {
                     localStorage.removeItem('token');
                 }
@@ -64,10 +67,14 @@ const Header = () => {
         setDrawerOpen(open);
     };
 
-    const navItems = [
+    const baseNavItems = [
         { name: 'Home', path: '/' },
-        { name: 'Safety Guidelines', path: '/safety-guidelines' }
+        { name: 'Safety Guidelines', path: '/safety-guidelines' },
     ];
+
+    const adminNavItem = { name: 'Reports', path: '/admin' };
+
+    const navItems = role === 'Admin' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
     return (
         <Box
@@ -165,22 +172,6 @@ const Header = () => {
                         <>
                             <Button
                                 variant="contained"
-                                component={Link}
-                                to="/register"
-                                sx={{
-                                    bgcolor: 'primary_red.main',
-                                    fontFamily: '"Jersey 15"',
-                                    color: 'white',
-                                    px: 3,
-                                    '&:hover': {
-                                        bgcolor: 'severity_red.main',
-                                    },
-                                }}
-                            >
-                                Register
-                            </Button>
-                            <Button
-                                variant="contained"
                                 component="a"
                                 href="https://localhost:7084/signin"
                                 sx={{
@@ -198,7 +189,7 @@ const Header = () => {
                         </>
                     ) : (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                {/* Korisničko ime + Ikonica */}
+                            {/* Korisničko ime + Ikonica */}
                             <PersonIcon sx={{ fontSize: 30, color: 'blue1.main' }} /> {/* Ikonica korisnika */}
                             <Typography
                                 variant="h6"
@@ -209,25 +200,25 @@ const Header = () => {
                             >
                                 {username}
                             </Typography>
-                            
-                                <Button
-                                    variant="outlined"
-                                    component="a"
-                                    href="https://localhost:7084/signout"
-                                    onClick={() => localStorage.removeItem('token')}
-                                    sx={{
-                                        borderColor: 'primary_red.main',
-                                        color: 'primary_red.main',
-                                        fontFamily: '"Jersey 15"',
-                                        px: 2,
-                                        '&:hover': {
-                                            borderColor: 'severity_red.main',
-                                            color: 'severity_red.main',
-                                        },
-                                    }}
-                                >
-                                    Log Out
-                                </Button>
+
+                            <Button
+                                variant="outlined"
+                                component="a"
+                                href="https://localhost:7084/signout"
+                                onClick={() => localStorage.removeItem('token')}
+                                sx={{
+                                    borderColor: 'primary_red.main',
+                                    color: 'primary_red.main',
+                                    fontFamily: '"Jersey 15"',
+                                    px: 2,
+                                    '&:hover': {
+                                        borderColor: 'severity_red.main',
+                                        color: 'severity_red.main',
+                                    },
+                                }}
+                            >
+                                Log Out
+                            </Button>
 
                         </Box>
                     )}
@@ -303,17 +294,16 @@ const Header = () => {
                                 </ListItem>
                             </>
                         ) : (
-                                <ListItem
-                                    component="a"
-                                    href="https://localhost:7084/signout"
-                                    onClick={() => localStorage.removeItem('token')}
-                                    sx={{
-                                        '&:hover': {
-                                            backgroundColor: '#f5f5f5'
-                                        }
-                                    }}
-                                >
-
+                            <ListItem
+                                component="a"
+                                href="https://localhost:7084/signout"
+                                onClick={() => localStorage.removeItem('token')}
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: '#f5f5f5'
+                                    }
+                                }}
+                            >
                                 <ListItemText
                                     primary="Log Out"
                                     primaryTypographyProps={{
