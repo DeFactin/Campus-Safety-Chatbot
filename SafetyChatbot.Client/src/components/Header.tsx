@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Typography,
@@ -12,15 +12,61 @@ import {
     ListItemText
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+
+type DecodedToken = {
+    name: string;
+    email: string;
+    role: string;
+    exp: number;
+};
 
 const Header = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [username, setUsername] = useState<string | null>(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const token = params.get('token');
+
+        if (token) {
+            localStorage.setItem('token', token);
+            try {
+                const decoded: DecodedToken = jwtDecode(token);
+                const cleanName = decoded.name.replace(/\s*\(.*?\)\s*$/, '').trim();
+                setUsername(cleanName);
+            } catch (err) {
+                console.error('Neispravan token:', err);
+            }
+
+            navigate(location.pathname, { replace: true });
+        } else {
+            const storedToken = localStorage.getItem('token');
+            if (storedToken) {
+                try {
+                    const decoded: DecodedToken = jwtDecode(storedToken);
+                    const cleanName = decoded.name.replace(/\s*\(.*?\)\s*$/, '').trim();
+                    setUsername(cleanName);
+                } catch {
+                    localStorage.removeItem('token');
+                }
+            }
+        }
+    }, [location, navigate]);
 
     const toggleDrawer = (open: boolean) => () => {
         setDrawerOpen(open);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setUsername(null);
+        window.location.href = '/';
     };
 
     const navItems = [
@@ -37,33 +83,19 @@ const Header = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 py: 2,
-                px: { xs: 10, lg: '130px' },
+                px: { xs: 4, lg: '130px' },
                 gap: 2,
             }}
         >
-            {/* Left side - Logo + Title + Menu (mobile) */}
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
-                }}
-            >
-                
-
+            {/* Logo + Naslov + Mobile menu ikona */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <Box
                     component="img"
                     src="/logoDark.png"
                     alt="University Logo"
-                    sx={{
-                        height: '90px',
-                        width: 'auto'
-                    }}
+                    sx={{ height: '90px', width: 'auto' }}
                 />
-
                 <Box>
-
-
                     <Typography
                         variant="h2"
                         sx={{
@@ -97,7 +129,6 @@ const Header = () => {
                         sx={{
                             color: 'blue1.main',
                             ml: 5,
-                            
                         }}
                     >
                         <MenuIcon fontSize="large" />
@@ -105,15 +136,9 @@ const Header = () => {
                 )}
             </Box>
 
-            {/* Right side - Navigation (desktop) */}
+            {/* Desktop navigacija */}
             {!isMobile && (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 3
-                    }}
-                >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                     {navItems.map((item) => (
                         <Box
                             key={item.name}
@@ -126,59 +151,89 @@ const Header = () => {
                                 textDecoration: 'none',
                                 '&:hover': {
                                     backgroundColor: '#f5f5f5',
-                                    cursor: 'pointer'
-                                }
+                                    cursor: 'pointer',
+                                },
                             }}
                         >
                             <Typography
                                 variant="h6"
                                 sx={{
                                     fontFamily: '"Jersey 15"',
-                                    color: 'blue1.main'
+                                    color: 'blue1.main',
                                 }}
                             >
                                 {item.name}
                             </Typography>
                         </Box>
                     ))}
-
-                    <Button
-                        variant="contained"
-                        component={Link}
-                        to="/register"
-                        sx={{
-                            bgcolor: 'primary_red.main',
-                            fontFamily: '"Jersey 15"',
-                            color: 'white',
-                            px: 3,
-                            '&:hover': {
-                                bgcolor: 'severity_red.main'
-                            }
-                        }}
-                    >
-                        Register
-                    </Button>
-
-                    <Button
-                        variant="contained"
-                        component={Link}
-                        to="/login"
-                        sx={{
-                            bgcolor: 'primary_red.main',
-                            fontFamily: '"Jersey 15"',
-                            color: 'white',
-                            px: 3,
-                            '&:hover': {
-                                bgcolor: 'severity_red.main'
-                            }
-                        }}
-                    >
-                        Log In
-                    </Button>
+                    {!username ? (
+                        <>
+                            <Button
+                                variant="contained"
+                                component={Link}
+                                to="/register"
+                                sx={{
+                                    bgcolor: 'primary_red.main',
+                                    fontFamily: '"Jersey 15"',
+                                    color: 'white',
+                                    px: 3,
+                                    '&:hover': {
+                                        bgcolor: 'severity_red.main',
+                                    },
+                                }}
+                            >
+                                Register
+                            </Button>
+                            <Button
+                                variant="contained"
+                                component="a"
+                                href="https://localhost:7084/signin"
+                                sx={{
+                                    bgcolor: 'primary_red.main',
+                                    fontFamily: '"Jersey 15"',
+                                    color: 'white',
+                                    px: 3,
+                                    '&:hover': {
+                                        bgcolor: 'severity_red.main',
+                                    },
+                                }}
+                            >
+                                Log In
+                            </Button>
+                        </>
+                    ) : (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontFamily: '"Jersey 15"',
+                                    color: 'blue1.main',
+                                }}
+                            >
+                                Welcome, {username}
+                            </Typography>
+                            <Button
+                                variant="outlined"
+                                onClick={handleLogout}
+                                sx={{
+                                    borderColor: 'primary_red.main',
+                                    color: 'primary_red.main',
+                                    fontFamily: '"Jersey 15"',
+                                    px: 2,
+                                    '&:hover': {
+                                        borderColor: 'severity_red.main',
+                                        color: 'severity_red.main',
+                                    },
+                                }}
+                            >
+                                Log Out
+                            </Button>
+                        </Box>
+                    )}
                 </Box>
             )}
 
-            {/* Mobile Drawer */}
+            {/* Mobile Drawer navigacija */}
             <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
                 <Box
                     sx={{ width: 250 }}
@@ -208,42 +263,63 @@ const Header = () => {
                                 />
                             </ListItem>
                         ))}
-                        <ListItem
-                            button
-                            component={Link}
-                            to="/register"
-                            sx={{
-                                '&:hover': {
-                                    backgroundColor: '#f5f5f5'
-                                }
-                            }}
-                        >
-                            <ListItemText
-                                primary="Register"
-                                primaryTypographyProps={{
-                                    fontFamily: '"Jersey 15"',
-                                    color: 'primary_red.main'
+                        {!username ? (
+                            <>
+                                <ListItem
+                                    button
+                                    component={Link}
+                                    to="/register"
+                                    sx={{
+                                        '&:hover': {
+                                            backgroundColor: '#f5f5f5'
+                                        }
+                                    }}
+                                >
+                                    <ListItemText
+                                        primary="Register"
+                                        primaryTypographyProps={{
+                                            fontFamily: '"Jersey 15"',
+                                            color: 'primary_red.main'
+                                        }}
+                                    />
+                                </ListItem>
+                                <ListItem
+                                    component="a"
+                                    href="https://localhost:7084/signin"
+                                    sx={{
+                                        '&:hover': {
+                                            backgroundColor: '#f5f5f5'
+                                        }
+                                    }}
+                                >
+                                    <ListItemText
+                                        primary="Log In"
+                                        primaryTypographyProps={{
+                                            fontFamily: '"Jersey 15"',
+                                            color: 'primary_red.main'
+                                        }}
+                                    />
+                                </ListItem>
+                            </>
+                        ) : (
+                            <ListItem
+                                component="button"
+                                onClick={handleLogout}
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: '#f5f5f5'
+                                    }
                                 }}
-                            />
-                        </ListItem>
-                        <ListItem
-                            button
-                            component={Link}
-                            to="/login"
-                            sx={{
-                                '&:hover': {
-                                    backgroundColor: '#f5f5f5'
-                                }
-                            }}
-                        >
-                            <ListItemText
-                                primary="Log In"
-                                primaryTypographyProps={{
-                                    fontFamily: '"Jersey 15"',
-                                    color: 'primary_red.main'
-                                }}
-                            />
-                        </ListItem>
+                            >
+                                <ListItemText
+                                    primary="Log Out"
+                                    primaryTypographyProps={{
+                                        fontFamily: '"Jersey 15"',
+                                        color: 'primary_red.main'
+                                    }}
+                                />
+                            </ListItem>
+                        )}
                     </List>
                 </Box>
             </Drawer>
