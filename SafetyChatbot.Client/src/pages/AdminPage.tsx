@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Box, Grid, Typography, Card, CardContent,
+    Box, Typography, Card, CardContent,
     Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Paper, Button, LinearProgress, CircularProgress
 } from '@mui/material';
 import {
-    Assignment, Warning, CheckCircle, HourglassTop,
+    Warning, CheckCircle, HourglassTop,
     AccessTime, BarChart, Refresh
 } from '@mui/icons-material';
 import { getIncidents } from '../services/ApiService';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Banner from '../components/Banner';
 
@@ -63,6 +64,14 @@ const AdminDashboard = () => {
         }
     };
 
+ 
+
+    const navigate = useNavigate();
+
+    const handleViewClick = (incidentId: string) => {
+        navigate(`/admin/${incidentId}`); // Dynamic route
+    };
+
     const calculateAvgResponseTime = (incidents: Incident[]): string => {
         // Implement your actual response time calculation logic here
         return '2.5h'; // Placeholder
@@ -75,6 +84,8 @@ const AdminDashboard = () => {
             </Box>
         );
     }
+
+    
 
     return (
         <Box sx={{ minHeight: '100vh' }}>
@@ -89,9 +100,6 @@ const AdminDashboard = () => {
                 maxWidth: '1400px',
                 margin: '0 auto'
             }}>
-                
-
-                
 
                 {/* Main Dashboard Container */}
                 <Card sx={{
@@ -305,6 +313,7 @@ const AdminDashboard = () => {
                                             <TableCell>{incident.description}</TableCell>
                                             <TableCell>
                                                 <Button
+                                                    onClick={() => handleViewClick(incident.id.toString())} 
                                                     size="small"
                                                     variant="outlined"
                                                     sx={{
@@ -312,8 +321,8 @@ const AdminDashboard = () => {
                                                         borderColor: 'blue2.main',
                                                         '&:hover': {
                                                             backgroundColor: 'blue2.main',
-                                                            color: 'white'
-                                                        }
+                                                            color: 'white',
+                                                        },
                                                     }}
                                                 >
                                                     View
