@@ -17,6 +17,9 @@ namespace SafetyChatbot.Application.Dtos
         public string IncidentType { get; set; }
 
         [Required]
+        public string Status { get; set; }
+
+        [Required]
         public string Description { get; set; }
 
         [Required]
@@ -26,7 +29,7 @@ namespace SafetyChatbot.Application.Dtos
         public string Location { get; set; }
 
         [Required]
-        public SeverityLevel Severity { get; set; }
+        public SeverityLevel SeverityCode { get; set; }
 
 
     }

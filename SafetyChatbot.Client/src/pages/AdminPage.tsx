@@ -238,7 +238,7 @@ const AdminDashboard = () => {
                             alignItems: 'center',
                             mb: 3
                         }}>
-                            <Typography variant="h6" sx={{ color: 'blue2.main' }}>
+                            <Typography variant="h3" sx={{ color: 'blue2.main' }}>
                                 <Warning sx={{ verticalAlign: 'middle', mr: 1 }} />
                                 Recent Incidents
                             </Typography>
@@ -254,16 +254,16 @@ const AdminDashboard = () => {
 
                         <TableContainer component={Paper}>
                             <Table>
-                                <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                                <TableHead sx={{ bgcolor: '#E7E8E9' }}>
                                     <TableRow>
-                                        <TableCell>ID</TableCell>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell>Date</TableCell>
-                                        <TableCell>Location</TableCell>
-                                        <TableCell>Severity</TableCell>
-                                        <TableCell>Status</TableCell>
-                                        <TableCell>Description</TableCell>
-                                        <TableCell>Actions</TableCell>
+                                        <TableCell sx={{ typography: 'h2' }}>ID</TableCell>
+                                            <TableCell sx={{ typography: 'h2' }}>Type</TableCell>
+                                            <TableCell sx={{ typography: 'h2' }}>Date</TableCell>
+                                            <TableCell sx={{ typography: 'h2' }}>Location</TableCell>
+                                            <TableCell sx={{ typography: 'h2' }}>Severity</TableCell>
+                                            <TableCell sx={{ typography: 'h2' }}>Status</TableCell>
+                                            <TableCell sx={{ typography: 'h2' }}>Description</TableCell>
+                                            <TableCell sx={{ typography: 'h2' }}>Actions</TableCell>                                      
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -275,14 +275,23 @@ const AdminDashboard = () => {
                                             <TableCell>{incident.location}</TableCell>
                                             <TableCell>
                                                 <Box sx={{
-                                                    p: 0.5,
+                                                    p: 1,
                                                     borderRadius: 1,
-                                                    bgcolor: incident.severity === 'High' ? '#ffebee' :
-                                                        incident.severity === 'Critical' ? '#f44336' : '#e8f5e9',
-                                                    color: incident.severity === 'Critical' ? 'white' : 'inherit',
-                                                    textAlign: 'center'
+                                                    backgroundColor:
+                                                        incident.severityCode === 0 ? '#ffebee' : // High = red
+                                                            incident.severityCode === 1 ? '#fff3e0' : // Medium = orange
+                                                                '#e8f5e9', // Low = green
+                                                    color:
+                                                        incident.severityCode === 0 ? '#d32f2f' : // High = dark red
+                                                            incident.severityCode === 1 ? '#fb8c00' : // Medium = dark orange
+                                                                '#2e7d32', // Low = dark green
+                                                    fontWeight: 'bold',
+                                                    textAlign: 'center',
+                                                    display: 'inline-block'
                                                 }}>
-                                                    {incident.severity}
+                                                    {incident.severityCode === 0 && 'High'}
+                                                    {incident.severityCode === 1 && 'Medium'}
+                                                    {incident.severityCode === 2 && 'Low'}
                                                 </Box>
                                             </TableCell>
                                             <TableCell>
