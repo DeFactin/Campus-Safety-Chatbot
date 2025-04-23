@@ -8,7 +8,8 @@ import HomePage from './pages/HomePage';
 import AdminPage from './pages/AdminPage';
 import IncidentDetailsPage from './pages/IncidentDetailsPage';
 import ProtectedRoute from './pages/ProtectedRoute';
-import UnauthorizedPage from './pages/UnathorizedPage';  
+import UnauthorizedPage from './pages/UnathorizedPage';
+import IncidentReportPage from './pages/IncidentReportPage';
 
 const App = () => {
     return (
@@ -17,7 +18,7 @@ const App = () => {
                 <Router>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/unauthorized" element={<UnauthorizedPage />} /> {}
+                        <Route path="/unauthorized" element={<UnauthorizedPage />} /> { }
                         <Route
                             path="/safety-guidelines"
                             element={
@@ -43,6 +44,10 @@ const App = () => {
                             }
                         />
                     </Routes>
+                    <Route path="/incident-report" element={
+                        <ProtectedRoute requiredRole="User">
+                            <IncidentReportPage />
+                        </ProtectedRoute>} />
                 </Router>
             </ThemeProvider>
         </div>
