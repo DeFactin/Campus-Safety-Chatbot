@@ -71,6 +71,7 @@ const Header = () => {
     const navItems = [
         { name: 'Home', path: '/' },
         { name: 'Safety Guidelines', path: '/safety-guidelines' },
+        { name: 'Report', path: '/incident-report' }
     ];
 
     return (
@@ -188,7 +189,7 @@ const Header = () => {
                                     color: 'blue1.main',
                                 }}
                             >
-                                Reports
+                                Dashboard
                             </Typography>
                         </Box>
                     )}
@@ -293,7 +294,7 @@ const Header = () => {
                                 }}
                             >
                                 <ListItemText
-                                    primary="Reports"
+                                    primary="Dashboard"
                                     primaryTypographyProps={{
                                         fontFamily: '"Jersey 15"',
                                         color: 'blue1.main'
