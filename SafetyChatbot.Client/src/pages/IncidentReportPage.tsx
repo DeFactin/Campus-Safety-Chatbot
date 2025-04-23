@@ -23,7 +23,8 @@ const IncidentReportPage = () => {
                 description,
                 date,
                 location,
-                severityLevel
+                severityLevel,
+                status: 'Pending', // Assuming status is a required field
             }
 
             const response = await createIncident(newIncident)

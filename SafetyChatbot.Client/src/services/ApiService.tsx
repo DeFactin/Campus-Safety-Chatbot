@@ -33,14 +33,11 @@ export interface NewIncident {
     date: string;  // Use ISO date string (e.g., "2025-04-22")
     location: string;
     severityLevel: 'low' | 'medium' | 'high';
+    status:string
 }
 
 // Submit a new incident report
 export const createIncident = async (newIncident: NewIncident) => {
-    const response = await api.post('/incidentreports', newIncident, {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
+    const response = await api.post('/incidentreports', newIncident);
     return response.data
 }

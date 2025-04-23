@@ -43,11 +43,12 @@ const App = () => {
                                 </ProtectedRoute>
                             }
                         />
+                        <Route path="/incident-report" element={
+                            <ProtectedRoute requiredRole="User">
+                                <IncidentReportPage />
+                            </ProtectedRoute>} />
                     </Routes>
-                    <Route path="/incident-report" element={
-                        <ProtectedRoute requiredRole="User">
-                            <IncidentReportPage />
-                        </ProtectedRoute>} />
+                    
                 </Router>
             </ThemeProvider>
         </div>
