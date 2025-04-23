@@ -6,9 +6,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SafetyGuidelinesPage from './pages/SafetyGuidelinesPage';
 import HomePage from './pages/HomePage';
 import AdminPage from './pages/AdminPage';
+import IncidentReportPage from './pages/IncidentReportPage';
 import IncidentDetailsPage from './pages/IncidentDetailsPage';
 import ProtectedRoute from './pages/ProtectedRoute';
 import UnauthorizedPage from './pages/UnathorizedPage';  
+
 
 const App = () => {
     return (
@@ -17,6 +19,8 @@ const App = () => {
                 <Router>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
+
+                      
                         <Route path="/unauthorized" element={<UnauthorizedPage />} /> {}
                         <Route
                             path="/safety-guidelines"
@@ -42,6 +46,7 @@ const App = () => {
                                 </ProtectedRoute>
                             }
                         />
+
                     </Routes>
                 </Router>
             </ThemeProvider>
