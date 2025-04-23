@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create an Axios instance
 const api = axios.create({
-    baseURL: 'https://localhost:7084/api',  // Correct base URL for your backend
+    baseURL: '/api',  // Correct base URL for your backend
 })
 
 // Fetch all safety guidelines
@@ -16,6 +16,7 @@ export const createGuideline = async (newGuideline: { title: string; description
     const response = await api.post('/guidelines', newGuideline)
     return response.data
 }
+
 
 // Other API calls
 
@@ -37,3 +38,12 @@ export const createIncident = async (newIncident: NewIncident) => {
     })
     return response.data
 }
+
+// Other API calls 
+export const getIncidents = async () => {
+    const response = await api.get('/incidentreports')
+    return response.data
+}
+
+
+
