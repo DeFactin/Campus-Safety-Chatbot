@@ -24,3 +24,23 @@ export const getIncidents = async () => {
 }
 
 
+// Other API calls
+
+// Type for new incident report
+export interface NewIncident {
+    incidentType: string;
+    description: string;
+    date: string;  // Use ISO date string (e.g., "2025-04-22")
+    location: string;
+    severityLevel: 'low' | 'medium' | 'high';
+}
+
+// Submit a new incident report
+export const createIncident = async (newIncident: NewIncident) => {
+    const response = await api.post('/incidentreports', newIncident, {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    return response.data
+}
