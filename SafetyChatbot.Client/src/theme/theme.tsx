@@ -61,6 +61,11 @@ const theme = createTheme({
             fontWeight: 400,
             fontSize: '80px'
         },
+        h5: {
+            fontFamily: '"Jersey 20", sans-serif',
+            fontWeight: 200,
+            fontSize: '18px'
+        },
     },
 });
 
