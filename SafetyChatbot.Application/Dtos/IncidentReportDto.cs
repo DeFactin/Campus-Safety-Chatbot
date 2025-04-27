@@ -29,7 +29,7 @@ namespace SafetyChatbot.Application.Dtos
         public string Location { get; set; }
 
         [Required]
-        public SeverityLevel SeverityCode { get; set; }
+        public string SeverityCode { get; set; }
 
 
     }
