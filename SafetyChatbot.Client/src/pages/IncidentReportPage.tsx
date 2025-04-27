@@ -8,12 +8,12 @@ const IncidentReportPage = () => {
     const [description, setDescription] = useState('')
     const [date, setDate] = useState('')
     const [location, setLocation] = useState('')
-    const [severityLevel, setSeverityLevel] = useState<'low' | 'medium' | 'high' | ''>('')
+    const [severityCode, setSeverityCode] = useState<'Low' | 'Medium' | 'High' | ''>('')
     const [file, setFile] = useState<File | null>(null)
 
     const handleSubmit = async () => {
         try {
-            if (!incidentType || !description || !date || !location || !severityLevel) {
+            if (!incidentType || !description || !date || !location || !severityCode) {
                 alert('Please fill all required fields')
                 return
             }
@@ -23,7 +23,7 @@ const IncidentReportPage = () => {
                 description,
                 date,
                 location,
-                severityLevel,
+                severityCode,
                 status: 'Pending', // Assuming status is a required field
             }
 
@@ -149,20 +149,20 @@ const IncidentReportPage = () => {
                                     <span style={{ color: 'red' }}>*</span> Severity Level:
                                 </Typography>
                                 <Box sx={{ display: 'flex', gap: 8, mt: 2 }}>
-                                    {['high', 'medium', 'low'].map((level) => (
+                                    {['High', 'Medium', 'Low'].map((level) => (
                                         <label key={level}>
                                             <input
                                                 type="radio"
                                                 name="severity"
                                                 value={level}
-                                                checked={severityLevel === level}
-                                                onChange={() => setSeverityLevel(level as 'low' | 'medium' | 'high')}
+                                                checked={severityCode === level}
+                                                onChange={() => setSeverityCode(level as 'Low' | 'Medium' | 'High')}
                                             />
                                             <span style={{
                                                 marginLeft: '6px',
                                                 fontFamily: '"Jersey 20"',
                                                 fontSize: '1.5rem',
-                                                color: level === 'high' ? 'red' : level === 'medium' ? 'orange' : 'yellow'
+                                                color: level === 'High' ? 'red' : level === 'Medium' ? 'orange' : 'yellow'
                                             }}>
                                                 {level.charAt(0).toUpperCase() + level.slice(1)}
                                             </span>

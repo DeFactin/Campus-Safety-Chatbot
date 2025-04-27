@@ -32,19 +32,14 @@ namespace SafetyChatbot.Domain.Models
         public string Location { get; set; }
 
         [Required]
-        public SeverityLevel  SeverityCode { get; set; }  // Numeric field for API input
+        public string  SeverityCode { get; set; }  
 
        
 
         
     }
 
-    public enum SeverityLevel
-    {
-        Low = 0,    
-        Medium = 1, 
-        High = 2    
-    }
+   
 
     /*public enum Status
     {

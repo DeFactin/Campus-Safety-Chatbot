@@ -18,8 +18,8 @@ interface Incident {
     incidentType: string;
     date: string;
     location: string;
-    severity: string;
-    status: 'Pending' | 'In Progress' | 'Resolved'; // Updated status options
+    severityCode: 'High' | 'Medium' | 'Low';
+    status: 'Pending' | 'In Progress' | 'Resolved'; 
     description: string;
 }
 
@@ -286,20 +286,18 @@ const AdminDashboard = () => {
                                                     p: 1,
                                                     borderRadius: 1,
                                                     backgroundColor:
-                                                        incident.severityCode === 0 ? '#ffebee' : // High = red
-                                                            incident.severityCode === 1 ? '#fff3e0' : // Medium = orange
+                                                        incident.severityCode === 'High' ? '#ffebee' : // High = red
+                                                            incident.severityCode === 'Medium' ? '#fff3e0' : // Medium = orange
                                                                 '#e8f5e9', // Low = green
                                                     color:
-                                                        incident.severityCode === 0 ? '#d32f2f' : // High = dark red
-                                                            incident.severityCode === 1 ? '#fb8c00' : // Medium = dark orange
+                                                        incident.severityCode === 'High' ? '#d32f2f' : // High = dark red
+                                                            incident.severityCode === 'Medium' ? '#fb8c00' : // Medium = dark orange
                                                                 '#2e7d32', // Low = dark green
                                                     fontWeight: 'bold',
                                                     textAlign: 'center',
                                                     display: 'inline-block'
                                                 }}>
-                                                    {incident.severityCode === 0 && 'High'}
-                                                    {incident.severityCode === 1 && 'Medium'}
-                                                    {incident.severityCode === 2 && 'Low'}
+                                                    {incident.severityCode.toString()}
                                                 </Box>
                                             </TableCell>
                                             <TableCell>
