@@ -1,10 +1,26 @@
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Typography, MenuItem, Select, FormControl, InputLabel } from '@mui/material'
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import { createIncident } from '../services/ApiService'
 
+// Define the allowed incident types
+const INCIDENT_TYPES = [
+    'Theft',
+    'Harassment',
+    'Abuse',
+    'Maintenance',
+    'Fire',
+    'Medical Emergency',
+    'Security Threat',
+    'Injury',
+    'Data Breach',
+    'Other'
+] as const;
+
+type IncidentType = typeof INCIDENT_TYPES[number];
+
 const IncidentReportPage = () => {
-    const [incidentType, setIncidentType] = useState('')
+    const [incidentType, setIncidentType] = useState<IncidentType | ''>('')
     const [description, setDescription] = useState('')
     const [date, setDate] = useState('')
     const [location, setLocation] = useState('')
@@ -24,7 +40,7 @@ const IncidentReportPage = () => {
                 date,
                 location,
                 severityCode,
-                status: 'Pending', // Assuming status is a required field
+                status: 'Pending',
             }
 
             const response = await createIncident(newIncident)
@@ -95,19 +111,36 @@ const IncidentReportPage = () => {
                                 gap: 3,
                             }}
                         >
-                            {/* Incident Type */}
+                            {/* Incident Type - Now a dropdown select */}
                             <Box>
                                 <Typography variant="h2" sx={labelStyle}>
                                     <span style={{ color: 'red' }}>*</span> Incident type:
                                 </Typography>
-                                <input
-                                    type="text"
-                                    value={incidentType}
-                                    onChange={(e) => setIncidentType(e.target.value)}
-                                    style={inputStyle}
-                                />
+                                <FormControl fullWidth sx={{ backgroundColor: 'white', borderRadius: '2px' }}>
+                                    <Select
+                                        value={incidentType}
+                                        onChange={(e) => setIncidentType(e.target.value as IncidentType)}
+                                        displayEmpty
+                                        inputProps={{ 'aria-label': 'Without label' }}
+                                        sx={{
+                                            height: '42px',
+                                            fontFamily: '"Jersey 20"',
+                                            fontSize: '1.2rem',
+                                        }}
+                                    >
+                                        <MenuItem value="" disabled>
+                                            <em>Select an incident type</em>
+                                        </MenuItem>
+                                        {INCIDENT_TYPES.map((type) => (
+                                            <MenuItem key={type} value={type}>
+                                                {type}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </Box>
 
+                            {/* Rest of your form remains the same */}
                             {/* Description */}
                             <Box>
                                 <Typography variant="h2" sx={labelStyle}>
