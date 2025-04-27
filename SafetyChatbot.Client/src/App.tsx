@@ -1,58 +1,28 @@
-﻿import React, { useEffect, useState } from 'react'
-import './App.css'
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './theme/theme';
+﻿import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import SafetyGuidelinesPage from './pages/SafetyGuidelinesPage';
-import HomePage from './pages/HomePage';
-import AdminPage from './pages/AdminPage';
-import IncidentDetailsPage from './pages/IncidentDetailsPage';
-import ProtectedRoute from './pages/ProtectedRoute';
-import UnauthorizedPage from './pages/UnathorizedPage';
-import IncidentReportPage from './pages/IncidentReportPage';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import theme from './theme/theme';
 
-const App = () => {
+// Pages
+import HomePage from './pages/HomePage';
+import ReportPage from './pages/IncidentReportPage';
+import AdminDashboardPage from './pages/AdminPage';
+import IncidentDetailsPage from './pages/IncidentDetailsPage';
+
+function App() {
     return (
-        <div>
-            <ThemeProvider theme={theme}>
-                <Router>
-                    <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/unauthorized" element={<UnauthorizedPage />} /> { }
-                        <Route
-                            path="/safety-guidelines"
-                            element={
-                                <ProtectedRoute requiredRole="User">
-                                    <SafetyGuidelinesPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin"
-                            element={
-                                <ProtectedRoute requiredRole="Admin">
-                                    <AdminPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/admin/:id"
-                            element={
-                                <ProtectedRoute requiredRole="Admin">
-                                    <IncidentDetailsPage />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route path="/incident-report" element={
-                            <ProtectedRoute requiredRole="User">
-                                <IncidentReportPage />
-                            </ProtectedRoute>} />
-                    </Routes>
-                    
-                </Router>
-            </ThemeProvider>
-        </div>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Router>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/report" element={<ReportPage />} />
+                    <Route path="/admin" element={<AdminDashboardPage />} />
+                    <Route path="/admin/incidents/:id" element={<IncidentDetailsPage />} />
+                </Routes>
+            </Router>
+        </ThemeProvider>
     );
-};
+}
 
 export default App;

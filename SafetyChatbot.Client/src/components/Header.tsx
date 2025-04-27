@@ -107,7 +107,7 @@ const Header = () => {
                             }
                         }}
                     >
-                        International University of Sarajevo
+                        International University of Sarajevo 
                     </Typography>
                     <Typography
                         variant="h1"
