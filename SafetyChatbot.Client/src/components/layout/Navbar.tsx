@@ -76,7 +76,13 @@ const Navbar: React.FC = () => {
                 <Container maxWidth="xl">
                     <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1, sm: 2 } }}>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Shield size={28} color={theme.palette.primary.main} />
+                            <Box
+                                component="img"
+                                src="/logoDark.png"
+                                alt="Logo"
+                                sx={{ height: '36px', width: 'auto' }}
+                            />
+                            
                             <Typography
                                 variant="h6"
                                 component={RouterLink}
