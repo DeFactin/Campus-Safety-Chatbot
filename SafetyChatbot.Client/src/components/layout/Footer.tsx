@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
                             IUS Campus Safety
                         </Typography>
                         <Typography variant="body2" paragraph>
-                            Providing 24/7 support and safety services to the International University of Sarajevo community.
+                            Providing 24/7 support and safety services to the IUS community.
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
                             <IconButton

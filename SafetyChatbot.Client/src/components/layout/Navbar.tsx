@@ -20,6 +20,7 @@ import { Shield, Menu, X } from 'lucide-react';
 const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Report Incident', path: '/report' },
+    { name: 'Safety Regulations'},
     { name: 'Admin Dashboard', path: '/admin' },
 ];
 
@@ -36,7 +37,7 @@ const Navbar: React.FC = () => {
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
                 <Typography variant="h6" component="div" sx={{ color: 'primary.main', fontWeight: 700 }}>
-                    IUS Safety
+                    IUS Campus Safety Chatbot
                 </Typography>
                 <IconButton color="primary">
                     <X size={24} />
@@ -95,7 +96,7 @@ const Navbar: React.FC = () => {
                                     display: { xs: 'none', sm: 'block' }
                                 }}
                             >
-                                IUS Campus Safety
+                                IUS Campus Safety Chatbot
                             </Typography>
                         </Box>
 
@@ -140,7 +141,7 @@ const Navbar: React.FC = () => {
                                         }
                                     }}
                                 >
-                                    Report Emergency
+                                    Log In
                                 </Button>
                             </Box>
                         )}
