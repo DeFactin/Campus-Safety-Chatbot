@@ -129,7 +129,7 @@ const Navbar: React.FC = () => {
                                 ))}
                                 <Button
                                     variant="contained"
-                                    color="primary"
+                                    color="error"
                                     component={RouterLink}
                                     to="/report"
                                     sx={{

@@ -10,10 +10,10 @@ const HeroSection: React.FC = () => {
     return (
         <Box
             sx={{
-                backgroundImage: 'linear-gradient(rgba(33, 61, 115, 0.9), rgba(32, 36, 83, 0.85)), url(https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2)',
+                backgroundImage: 'linear-gradient(rgba(33, 61, 115, 0.8), rgba(32, 36, 83, 0.85)), url(../public/ius2.jpg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                minHeight: '85vh',
+                minHeight: '100vh',
                 display: 'flex',
                 alignItems: 'center',
                 color: 'white',
@@ -21,7 +21,7 @@ const HeroSection: React.FC = () => {
             }}
         >
             <Container maxWidth="lg">
-                <Grid container spacing={4} alignItems="center">
+                <Grid container spacing={3} alignItems="center">
                     <Grid item xs={12} md={7}>
                         <Box sx={{ maxWidth: 650 }}>
                             <Typography
@@ -71,7 +71,7 @@ const HeroSection: React.FC = () => {
                                     color="warning"
                                     size="large"
                                     component={RouterLink}
-                                    to="/report"
+                                    to="/chat"
                                     sx={{
                                         px: 4,
                                         py: 1.5,
@@ -83,13 +83,13 @@ const HeroSection: React.FC = () => {
                                         }
                                     }}
                                 >
-                                    Report an Incident
+                                    Ask Safety Chatbot
                                 </Button>
                                 <Button
                                     variant="outlined"
                                     size="large"
                                     component={RouterLink}
-                                    to="/chat"
+                                    to="/report"
                                     sx={{
                                         px: 4,
                                         py: 1.5,
@@ -102,7 +102,7 @@ const HeroSection: React.FC = () => {
                                         }
                                     }}
                                 >
-                                    Ask Safety Chatbot
+                                    Report Incident
                                 </Button>
                             </Box>
                         </Box>
