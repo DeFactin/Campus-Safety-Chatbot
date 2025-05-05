@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="fixed" color="default" elevation={1} sx={{ backgroundColor: 'white' }}>
+            <AppBar position="fixed" color="default" elevation={10} sx={{ backgroundColor: 'white' }}>
                 <Container maxWidth="xl">
                     <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1, sm: 2 } }}>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -130,8 +130,7 @@ const Navbar: React.FC = () => {
                                 <Button
                                     variant="contained"
                                     color="error"
-                                    component={RouterLink}
-                                    to="/report"
+                                    href="https://localhost:7084/signin"
                                     sx={{
                                         ml: 2,
                                         px: 3,
