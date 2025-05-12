@@ -34,7 +34,7 @@ namespace SafetyChatbot.Domain.Models
         public string Location { get; set; }
 
         [Required]
-        public string  SeverityCode { get; set; }  
+        public string  SeverityLevel { get; set; }  
 
        
 

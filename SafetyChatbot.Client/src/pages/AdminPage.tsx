@@ -21,7 +21,7 @@ const AdminDashboardPage: React.FC = () => {
                     ]}
                 />
 
-                <StatisticsOverview />
+                
                 <IncidentsList />
             </Container>
 
