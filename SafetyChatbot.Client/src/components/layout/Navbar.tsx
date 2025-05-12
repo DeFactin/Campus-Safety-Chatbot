@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
     AppBar,
     Box,
@@ -14,13 +14,23 @@ import {
     useMediaQuery,
     useTheme
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { Shield, Menu, X } from 'lucide-react';
+import PersonIcon from '@mui/icons-material/Person';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';  // Import js-cookie
+
+type DecodedToken = {
+    name: string;
+    email: string;
+    role: string;
+    exp: number;
+};
 
 const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Report Incident', path: '/report' },
-    { name: 'Safety Regulations'},
+    { name: 'Safety Regulations', path: '/regulations' },
     { name: 'Admin Dashboard', path: '/admin' },
 ];
 
@@ -29,9 +39,49 @@ const Navbar: React.FC = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+    const [username, setUsername] = useState<string | null>(null);
+    const [role, setRole] = useState<string | null>(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const token = params.get('token');
+        console.log(Cookies.get('token')); // Provjerite što vraća
+
+        if (token) {
+            Cookies.set('token', token, { expires: 1 });  // Token pohranjen u cookie, s rokom trajanja od 1 dana
+            try {
+                const decoded: DecodedToken = jwtDecode(token);
+                const cleanName = decoded.name.split(' ')[0];
+                setUsername(cleanName);
+                setRole(decoded.role);
+            } catch (err) {
+                console.error('Neispravan token:', err);
+            }
+            navigate(location.pathname, { replace: true });
+        } else {
+            const storedToken = Cookies.get('token');  // Dohvat tokena iz cookieja
+            if (storedToken) {
+                try {
+                    const decoded: DecodedToken = jwtDecode(storedToken);
+                    const cleanName = decoded.name.split(' ')[0];
+                    setUsername(cleanName);
+                    setRole(decoded.role);
+                } catch {
+                    Cookies.remove('token');  // Uklanjanje nevažećeg tokena iz cookieja
+                }
+            }
+        }
+    }, [location, navigate]);
+
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
+
+    const filteredNavItems = navItems.filter(
+        item => item.name !== 'Admin Dashboard' || role === 'Admin'
+    );
 
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
@@ -44,11 +94,34 @@ const Navbar: React.FC = () => {
                 </IconButton>
             </Box>
             <List>
-                {navItems.map((item) => (
+                {username &&
+                    filteredNavItems.map((item) => (
+                        <ListItem
+                            key={item.name}
+                            component={RouterLink}
+                            to={item.path}
+                            sx={{
+                                textAlign: 'center',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(33, 61, 115, 0.08)',
+                                }
+                            }}
+                        >
+                            <ListItemText
+                                primary={item.name}
+                                sx={{
+                                    color: 'text.primary',
+                                    '.MuiListItemText-primary': {
+                                        fontWeight: 500,
+                                    }
+                                }}
+                            />
+                        </ListItem>
+                    ))}
+                {!username && (
                     <ListItem
-                        key={item.name}
-                        component={RouterLink}
-                        to={item.path}
+                        component="a"
+                        href="https://localhost:7084/signin"
                         sx={{
                             textAlign: 'center',
                             '&:hover': {
@@ -57,7 +130,7 @@ const Navbar: React.FC = () => {
                         }}
                     >
                         <ListItemText
-                            primary={item.name}
+                            primary="Log In"
                             sx={{
                                 color: 'text.primary',
                                 '.MuiListItemText-primary': {
@@ -66,7 +139,7 @@ const Navbar: React.FC = () => {
                             }}
                         />
                     </ListItem>
-                ))}
+                )}
             </List>
         </Box>
     );
@@ -83,7 +156,6 @@ const Navbar: React.FC = () => {
                                 alt="Logo"
                                 sx={{ height: '36px', width: 'auto' }}
                             />
-                            
                             <Typography
                                 variant="h6"
                                 component={RouterLink}
@@ -109,9 +181,9 @@ const Navbar: React.FC = () => {
                             >
                                 <Menu />
                             </IconButton>
-                        ) : (
+                        ) : username ? (
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                {navItems.map((item) => (
+                                {filteredNavItems.map((item) => (
                                     <Button
                                         key={item.name}
                                         component={RouterLink}
@@ -127,12 +199,17 @@ const Navbar: React.FC = () => {
                                         {item.name}
                                     </Button>
                                 ))}
+                                <Typography sx={{ mx: 2, fontWeight: 500, display: 'flex', alignItems: 'center' }}>
+                                    <PersonIcon sx={{ mr: 0.5 }} />
+                                    {role === 'Admin' ? 'Admin' : 'User'} {username}
+                                </Typography>
                                 <Button
                                     variant="contained"
                                     color="error"
-                                    href="https://localhost:7084/signin"
+                                    href="https://localhost:7084/signout"
+                                    onClick={() => Cookies.remove('token')}  // Uklanjanje tokena iz cookieja
                                     sx={{
-                                        ml: 2,
+                                        ml: 1,
                                         px: 3,
                                         transition: 'all 0.3s',
                                         '&:hover': {
@@ -140,9 +217,25 @@ const Navbar: React.FC = () => {
                                         }
                                     }}
                                 >
-                                    Log In
+                                    Log Out
                                 </Button>
                             </Box>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                color="error"
+                                href="https://localhost:7084/signin"
+                                sx={{
+                                    ml: 2,
+                                    px: 3,
+                                    transition: 'all 0.3s',
+                                    '&:hover': {
+                                        transform: 'translateY(-2px)',
+                                    }
+                                }}
+                            >
+                                Log In
+                            </Button>
                         )}
                     </Toolbar>
                 </Container>
@@ -152,7 +245,7 @@ const Navbar: React.FC = () => {
                 open={mobileOpen}
                 onClose={handleDrawerToggle}
                 ModalProps={{
-                    keepMounted: true, // Better open performance on mobile
+                    keepMounted: true,
                 }}
                 sx={{
                     display: { xs: 'block', md: 'none' },
@@ -161,7 +254,7 @@ const Navbar: React.FC = () => {
             >
                 {drawer}
             </Drawer>
-            <Toolbar /> {/* This toolbar is for spacing below the fixed AppBar */}
+            <Toolbar />
         </Box>
     );
 };

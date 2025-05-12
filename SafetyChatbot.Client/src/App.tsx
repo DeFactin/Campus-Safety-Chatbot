@@ -8,6 +8,8 @@ import HomePage from './pages/HomePage';
 import ReportPage from './pages/IncidentReportPage';
 import AdminDashboardPage from './pages/AdminPage';
 import IncidentDetailsPage from './pages/IncidentDetailsPage';
+import UnauthorizedPage from './pages/UnathorizedPage';
+import ProtectedRoute from './pages/ProtectedRoute';
 
 function App() {
     return (
@@ -16,9 +18,20 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/report" element={<ReportPage />} />
-                    <Route path="/admin" element={<AdminDashboardPage />} />
-                    <Route path="/admin/incidents/:id" element={<IncidentDetailsPage />} />
+                    <Route path="/unauthorized" element={<UnauthorizedPage />} /> { }
+                    <Route path="/report" element={
+                        <ProtectedRoute requiredRole="User">
+                            <ReportPage />
+                        </ProtectedRoute>} />
+                    <Route path="/admin" element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <AdminDashboardPage />
+                        </ProtectedRoute>} />
+                    <Route path="/admin/incidents/:id" element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <IncidentDetailsPage />
+                        </ProtectedRoute>
+                    } />
                 </Routes>
             </Router>
         </ThemeProvider>

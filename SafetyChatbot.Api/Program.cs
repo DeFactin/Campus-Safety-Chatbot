@@ -5,12 +5,14 @@ using SafetyChatbot.Api.MappingProfiles;
 using SafetyChatbot.Infrastructure.Repositories;
 using Microsoft.Identity.Web;
 using System.Security.Authentication;
+using SafetyChatbot.Domain.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Get the connection string directly
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 // Register DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
