@@ -18,7 +18,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { Shield, Menu, X } from 'lucide-react';
 import PersonIcon from '@mui/icons-material/Person';
 import { jwtDecode } from 'jwt-decode';
-import Cookies from 'js-cookie';  // Import js-cookie
+import Cookies from 'js-cookie';
 
 type DecodedToken = {
     name: string;
@@ -47,10 +47,9 @@ const Navbar: React.FC = () => {
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const token = params.get('token');
-        console.log(Cookies.get('token')); // Provjerite što vraća
 
         if (token) {
-            Cookies.set('token', token, { expires: 1 });  // Token pohranjen u cookie, s rokom trajanja od 1 dana
+            Cookies.set('token', token, { expires: 1 });
             try {
                 const decoded: DecodedToken = jwtDecode(token);
                 const cleanName = decoded.name.split(' ')[0];
@@ -61,7 +60,7 @@ const Navbar: React.FC = () => {
             }
             navigate(location.pathname, { replace: true });
         } else {
-            const storedToken = Cookies.get('token');  // Dohvat tokena iz cookieja
+            const storedToken = Cookies.get('token');
             if (storedToken) {
                 try {
                     const decoded: DecodedToken = jwtDecode(storedToken);
@@ -69,7 +68,7 @@ const Navbar: React.FC = () => {
                     setUsername(cleanName);
                     setRole(decoded.role);
                 } catch {
-                    Cookies.remove('token');  // Uklanjanje nevažećeg tokena iz cookieja
+                    Cookies.remove('token');
                 }
             }
         }
@@ -77,6 +76,12 @@ const Navbar: React.FC = () => {
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+    };
+
+    const handleLogout = () => {
+        Cookies.remove('token');
+        navigate('/');
+        window.location.reload();
     };
 
     const filteredNavItems = navItems.filter(
@@ -94,31 +99,53 @@ const Navbar: React.FC = () => {
                 </IconButton>
             </Box>
             <List>
-                {username &&
-                    filteredNavItems.map((item) => (
+                {username ? (
+                    <>
+                        {filteredNavItems.map((item) => (
+                            <ListItem
+                                key={item.name}
+                                component={RouterLink}
+                                to={item.path}
+                                sx={{
+                                    textAlign: 'center',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(33, 61, 115, 0.08)',
+                                    }
+                                }}
+                            >
+                                <ListItemText
+                                    primary={item.name}
+                                    sx={{
+                                        color: 'text.primary',
+                                        '.MuiListItemText-primary': {
+                                            fontWeight: 500,
+                                        }
+                                    }}
+                                />
+                            </ListItem>
+                        ))}
                         <ListItem
-                            key={item.name}
-                            component={RouterLink}
-                            to={item.path}
+                            button
+                            onClick={handleLogout}
                             sx={{
                                 textAlign: 'center',
                                 '&:hover': {
-                                    backgroundColor: 'rgba(33, 61, 115, 0.08)',
+                                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
                                 }
                             }}
                         >
                             <ListItemText
-                                primary={item.name}
+                                primary="Log Out"
                                 sx={{
-                                    color: 'text.primary',
+                                    color: 'error.main',
                                     '.MuiListItemText-primary': {
-                                        fontWeight: 500,
+                                        fontWeight: 600,
                                     }
                                 }}
                             />
                         </ListItem>
-                    ))}
-                {!username && (
+                    </>
+                ) : (
                     <ListItem
                         component="a"
                         href="https://localhost:7084/signin"
@@ -206,8 +233,7 @@ const Navbar: React.FC = () => {
                                 <Button
                                     variant="contained"
                                     color="error"
-                                    href="https://localhost:7084/signout"
-                                    onClick={() => Cookies.remove('token')}  // Uklanjanje tokena iz cookieja
+                                    onClick={handleLogout}
                                     sx={{
                                         ml: 1,
                                         px: 3,
