@@ -1,11 +1,23 @@
-import React from 'react';
-import { Box, Typography, Button, Container, Grid, useTheme, useMediaQuery } from '@mui/material';
+﻿import React from 'react';
+import {
+    Box,
+    Typography,
+    Button,
+    Container,
+    Grid,
+    useTheme,
+    useMediaQuery
+} from '@mui/material';
 import { ShieldCheck, MessageSquare, AlertCircle } from 'lucide-react';
 import { Link as RouterLink } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const HeroSection: React.FC = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    const token = Cookies.get('token');
+    const isAuthenticated = Boolean(token);
 
     return (
         <Box
@@ -71,7 +83,7 @@ const HeroSection: React.FC = () => {
                                     color="warning"
                                     size="large"
                                     component={RouterLink}
-                                    to="/chat"
+                                    to={isAuthenticated ? "/chat" : "https://localhost:7084/signin"}
                                     sx={{
                                         px: 4,
                                         py: 1.5,
@@ -89,7 +101,7 @@ const HeroSection: React.FC = () => {
                                     variant="outlined"
                                     size="large"
                                     component={RouterLink}
-                                    to="/report"
+                                    to={isAuthenticated ? "/report" : "https://localhost:7084/signin"}
                                     sx={{
                                         px: 4,
                                         py: 1.5,
