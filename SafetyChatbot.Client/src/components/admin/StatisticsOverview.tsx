@@ -1,7 +1,6 @@
 import React from 'react';
 import {
     Box,
-    Grid,
     Paper,
     Typography,
     useTheme,
@@ -22,19 +21,28 @@ import { Pie, Bar } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
+interface StatCard {
+    title: string;
+    value: number;
+    icon: React.ReactNode;
+    color: string;
+    percentage?: number;
+}
+
 const StatisticsOverview: React.FC = () => {
     const theme = useTheme();
     const stats = calculateStatistics();
 
+    // Chart data and options
     const statusChartData = {
         labels: ['Pending', 'In Progress', 'Resolved'],
         datasets: [
             {
                 data: [stats.pendingCount, stats.inProgressCount, stats.resolvedCount],
                 backgroundColor: [
-                    theme.palette.warning.main,  // Pending
-                    theme.palette.primary.main,  // In Progress
-                    theme.palette.success.main,  // Resolved
+                    theme.palette.warning.main,
+                    theme.palette.primary.main,
+                    theme.palette.success.main,
                 ],
                 borderColor: [
                     theme.palette.warning.main,
@@ -103,7 +111,7 @@ const StatisticsOverview: React.FC = () => {
         },
     };
 
-    const statCards = [
+    const statCards: StatCard[] = [
         {
             title: 'Total Incidents',
             value: stats.totalIncidents,
@@ -135,9 +143,18 @@ const StatisticsOverview: React.FC = () => {
 
     return (
         <Box sx={{ mb: 4 }}>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* Stat Cards - Flexbox Version */}
+            <Box sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 3,
+                mb: 4
+            }}>
                 {statCards.map((card, index) => (
-                    <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Box key={index} sx={{
+                        flex: '1 1 calc(25% - 24px)',
+                        minWidth: { xs: '100%', sm: 'calc(50% - 24px)', md: 'calc(25% - 24px)' }
+                    }}>
                         <Card
                             elevation={0}
                             sx={{
@@ -158,7 +175,12 @@ const StatisticsOverview: React.FC = () => {
                             }}
                         >
                             <CardContent sx={{ p: 3 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    mb: 1
+                                }}>
                                     <Typography variant="subtitle2" color="text.secondary">
                                         {card.title}
                                     </Typography>
@@ -179,7 +201,11 @@ const StatisticsOverview: React.FC = () => {
 
                                 {card.percentage !== undefined && (
                                     <Box sx={{ mt: 2 }}>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                        <Box sx={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            mb: 0.5
+                                        }}>
                                             <Typography variant="caption" color="text.secondary">
                                                 {card.percentage}% of total
                                             </Typography>
@@ -200,12 +226,20 @@ const StatisticsOverview: React.FC = () => {
                                 )}
                             </CardContent>
                         </Card>
-                    </Grid>
+                    </Box>
                 ))}
-            </Grid>
+            </Box>
 
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+            {/* Charts - Flexbox Version */}
+            <Box sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 3
+            }}>
+                <Box sx={{
+                    flex: '1 1 calc(50% - 24px)',
+                    minWidth: { xs: '100%', md: 'calc(50% - 24px)' }
+                }}>
                     <Paper
                         elevation={0}
                         sx={{
@@ -223,9 +257,12 @@ const StatisticsOverview: React.FC = () => {
                             <Pie data={statusChartData} options={pieChartOptions} />
                         </Box>
                     </Paper>
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} md={6}>
+                <Box sx={{
+                    flex: '1 1 calc(50% - 24px)',
+                    minWidth: { xs: '100%', md: 'calc(50% - 24px)' }
+                }}>
                     <Paper
                         elevation={0}
                         sx={{
@@ -243,8 +280,8 @@ const StatisticsOverview: React.FC = () => {
                             <Bar data={severityChartData} options={barChartOptions} />
                         </Box>
                     </Paper>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
         </Box>
     );
 };
