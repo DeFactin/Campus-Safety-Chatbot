@@ -1,16 +1,14 @@
-export type SeverityLevel = 'High' | 'Medium' | 'Low';
-export type IncidentStatus = 'pending' | 'in_progress' | 'resolved';
+export type IncidentStatus = 'Pending' | 'In Progress' | 'Resolved';
+export type SeverityLevel = 'high' | 'medium' | 'low';
+
 
 export interface Incident {
-    id: number;
+    id: number; 
     incidentType: string;
+    reportedBy?: string; // optional, in case it's null or undefined
     location: string;
-    date: string;
-    description: string;
-    severityLevel: SeverityLevel;
-    evidenceFile?: string;
+    date: string; // ISO date string
+    severity: SeverityLevel;
     status: IncidentStatus;
-    reportedBy: string;
-    reportedAt: string;
-    updatedAt: string;
+    description: string;
 }
