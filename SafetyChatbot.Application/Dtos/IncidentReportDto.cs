@@ -12,6 +12,7 @@ namespace SafetyChatbot.Application.Dtos
     {
         public int Id { get; set; }
 
+        public string ReportedBy { get; set; }
 
         [Required]
         public string IncidentType { get; set; }
