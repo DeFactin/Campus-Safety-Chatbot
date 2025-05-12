@@ -11,6 +11,7 @@ import IncidentDetailsPage from './pages/IncidentDetailsPage';
 import UnauthorizedPage from './pages/UnathorizedPage';
 import ProtectedRoute from './pages/ProtectedRoute';
 
+import ChatPage from './pages/ChatPage';
 function App() {
     return (
         <ThemeProvider theme={theme}>
@@ -32,6 +33,11 @@ function App() {
                             <IncidentDetailsPage />
                         </ProtectedRoute>
                     } />
+                    <Route path="/chat" element={
+                    <ProtectedRoute requiredRole="User">
+                        <ChatPage />
+                    </ProtectedRoute>} />
+
                 </Routes>
             </Router>
         </ThemeProvider>
