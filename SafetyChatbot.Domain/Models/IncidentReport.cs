@@ -16,6 +16,8 @@ namespace SafetyChatbot.Domain.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        public string ReportedBy { get; set; }
+
         [Required]
         public string IncidentType { get; set; }
 

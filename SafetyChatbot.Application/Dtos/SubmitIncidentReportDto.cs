@@ -11,6 +11,8 @@ namespace SafetyChatbot.Application.Dtos
     public class SubmitIncidentReportDto
     {
 
+        public string ReportedBy { get; set; }
+
         [Required]
         public string IncidentType { get; set; }
 
