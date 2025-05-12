@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 import ReportPage from './pages/IncidentReportPage';
 import AdminDashboardPage from './pages/AdminPage';
 import IncidentDetailsPage from './pages/IncidentDetailsPage';
-
+import ChatPage from './pages/ChatPage';
 function App() {
     return (
         <ThemeProvider theme={theme}>
@@ -18,7 +18,9 @@ function App() {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/report" element={<ReportPage />} />
                     <Route path="/admin" element={<AdminDashboardPage />} />
+                    <Route path="/chat" element={<ChatPage />} />
                     <Route path="/admin/incidents/:id" element={<IncidentDetailsPage />} />
+                    
                 </Routes>
             </Router>
         </ThemeProvider>
