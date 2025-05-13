@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Paper,
@@ -9,7 +9,6 @@ import {
     Divider,
     LinearProgress
 } from '@mui/material';
-import { calculateStatistics } from '../../data/mockData';
 import {
     AlertTriangle,
     Clock,
@@ -18,6 +17,8 @@ import {
 } from 'lucide-react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
+import { Incident, IncidentStatus, SeverityLevel } from '../../types/incident';
+import { getIncidents } from '../../services/ApiService';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
@@ -29,10 +30,59 @@ interface StatCard {
     percentage?: number;
 }
 
+
 const StatisticsOverview: React.FC = () => {
     const theme = useTheme();
-    const stats = calculateStatistics();
+   
+    const [incidents, setIncidents] = useState<Incident[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await getIncidents();
+                setIncidents(data);
+            } catch (error) {
+                console.error('Failed to load incidents:', error);
+                setError('Failed to load incidents.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const calculateStatistics = () => {
+        const totalIncidents = incidents.length;
+        const pendingCount = incidents.filter(incident => incident.status === 'Pending').length;
+        const inProgressCount = incidents.filter(incident => incident.status === 'In Progress').length;
+        const resolvedCount = incidents.filter(incident => incident.status === 'Resolved').length;
+
+        const highSeverityCount = incidents.filter(incident => incident.severity === 'high').length;
+        const mediumSeverityCount = incidents.filter(incident => incident.severity === 'medium').length;
+        const lowSeverityCount = incidents.filter(incident => incident.severity === 'low').length;
+
+        return {
+            totalIncidents,
+            pendingCount,
+            inProgressCount,
+            resolvedCount,
+            highSeverityCount,
+            mediumSeverityCount,
+            lowSeverityCount,
+
+            // Calculate percentages
+            pendingPercentage: Math.round((pendingCount / totalIncidents) * 100),
+            inProgressPercentage: Math.round((inProgressCount / totalIncidents) * 100),
+            resolvedPercentage: Math.round((resolvedCount / totalIncidents) * 100),
+
+            highSeverityPercentage: Math.round((highSeverityCount / totalIncidents) * 100),
+            mediumSeverityPercentage: Math.round((mediumSeverityCount / totalIncidents) * 100),
+            lowSeverityPercentage: Math.round((lowSeverityCount / totalIncidents) * 100),
+        };
+    };
+    const stats = calculateStatistics();
     // Chart data and options
     const statusChartData = {
         labels: ['Pending', 'In Progress', 'Resolved'],

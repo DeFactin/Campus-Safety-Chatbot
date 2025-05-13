@@ -23,6 +23,11 @@ import {
     useTheme,
     CircularProgress
 } from '@mui/material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+
 import { Search, Eye, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -88,12 +93,30 @@ const IncidentsList: React.FC = () => {
 
     const getStatusColor = (status: IncidentStatus) => {
         switch (status) {
-            case 'Pending': return 'warning';
-            case 'In Progress': return 'primary';
-            case 'Resolved': return 'success';
-            default: return 'default';
+            case 'Pending': return theme.palette.warning.main;
+            case 'In Progress': return theme.palette.primary.main;
+            case 'Resolved': return theme.palette.success.main;
+            default: return theme.palette.grey[500];
         }
     };
+
+
+     
+
+    const getStatusIcon = (status: IncidentStatus) => {
+        const color = getStatusColor(status);
+        switch (status) {
+            case 'Pending':
+                return <AccessTimeIcon sx={{ color }} />;
+            case 'In Progress':
+                return <AutorenewIcon sx={{ color }} />;
+            case 'Resolved':
+                return <CheckCircleIcon sx={{ color }} />;
+            default:
+                return <HelpOutlineIcon sx={{ color }} />;
+        }
+    };
+
 
     const getSeverityColor = (severity: SeverityLevel) => {
         switch (severity) {
@@ -210,6 +233,7 @@ const IncidentsList: React.FC = () => {
                             <TableCell>Date</TableCell>
                             <TableCell>Severity</TableCell>
                             <TableCell>Status</TableCell>
+                            <TableCell>Description</TableCell>
                             <TableCell align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -239,19 +263,35 @@ const IncidentsList: React.FC = () => {
                                         })}
                                     </TableCell>
                                     <TableCell>
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            
-                                            <Typography>
-                                                {incident.severity}
-                                            </Typography>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell>
                                         <Chip
-                                            label={incident.status}
-                                            color={getStatusColor(incident.status) as "warning" | "primary" | "success" | "default"}
+                                            label={incident.severity}
                                             size="small"
+                                            sx={{
+                                                backgroundColor: getSeverityColor(incident.severity),
+                                                color: '#fff',
+                                                textTransform: 'capitalize',
+                                            }}
                                         />
+                                    </TableCell>
+                                    
+                                    <TableCell>
+                                       
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                            
+                                            <Typography variant="body2">{incident.status}</Typography>
+                                            {getStatusIcon(incident.status)}
+                                        </Box>
+
+                                        
+                                    </TableCell>
+                                    <TableCell sx={{ maxWidth: 200 }}>
+                                        <Typography
+                                            variant="body2"
+                                            noWrap
+                                            sx={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
+                                        >
+                                            {incident.description}
+                                        </Typography>
                                     </TableCell>
                                     <TableCell align="right">
                                         <Tooltip title="View Details">

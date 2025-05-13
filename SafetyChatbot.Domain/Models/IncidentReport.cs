@@ -22,7 +22,7 @@ namespace SafetyChatbot.Domain.Models
         public string IncidentType { get; set; }
 
         [Required]
-        public string Status { get; set; }  // Numeric field for API input
+        public string Status { get; set; }  
 
         [Required]
         public string Description { get; set; }
@@ -34,20 +34,13 @@ namespace SafetyChatbot.Domain.Models
         public string Location { get; set; }
 
         [Required]
-        public string  SeverityLevel { get; set; }  
+        public string Severity { get; set; }  
 
        
 
         
     }
 
-   
-
-    /*public enum Status
-    {
-        Pending = 0,    
-        InProgress = 1,  
-        Resolved = 2    
-    }*/
+  
 }
 
