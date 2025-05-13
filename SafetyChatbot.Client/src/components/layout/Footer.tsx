@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import {
     Facebook,
-    Twitter,
     Instagram,
     Mail,
     MapPin,
@@ -54,7 +53,7 @@ const Footer: React.FC = () => {
                             Providing 24/7 safety services to the IUS community.
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                            {[Facebook, Twitter, Instagram].map((Icon, idx) => (
+                            {[Facebook, Instagram].map((Icon, idx) => (
                                 <IconButton
                                     key={idx}
                                     sx={{
@@ -83,7 +82,7 @@ const Footer: React.FC = () => {
                         <Typography variant="h6" fontWeight="bold" mb="16px">
                             Quick Links
                         </Typography>
-                        {['Home', 'Report Incident', 'Admin Dashboard', 'Safety Resources'].map((text) => (
+                        {['Home', 'Report Incident', 'Admin Dashboard', 'Safety Regulations'].map((text) => (
                             <Link
                                 key={text}
                                 href="#"
@@ -109,7 +108,7 @@ const Footer: React.FC = () => {
                         <Typography variant="h6" fontWeight="bold" mb="16px">
                             University Policies
                         </Typography>
-                        {['Code of Conduct', 'Emergency Procedures', 'Privacy Policy', 'Terms of Service'].map((text) => (
+                        {[ 'Emergency Contacts', 'Privacy Policy', 'Terms of Service'].map((text) => (
                             <Link
                                 key={text}
                                 href="#"

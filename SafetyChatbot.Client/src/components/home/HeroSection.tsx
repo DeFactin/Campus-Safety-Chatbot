@@ -22,7 +22,7 @@ const HeroSection: React.FC = () => {
     return (
         <Box
             sx={{
-                backgroundImage: 'linear-gradient(rgba(33, 61, 115, 0.8), rgba(32, 36, 83, 0.85)), url(../public/ius2.jpg)',
+                backgroundImage: 'linear-gradient(rgba(33, 61, 115, 0.8), rgba(32, 36, 83, 0.85)), url(../ius2.jpg)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 minHeight: '100vh',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Container, Button, CircularProgress } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -6,14 +6,29 @@ import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import PageHeader from '../components/common/PageHeader';
 import IncidentDetails from '../components/admin/IncidentDetails';
-//import { mockIncidents } from '../data/mockData';
+import { Incident, IncidentStatus, SeverityLevel } from '../types/incident';
 
 const IncidentDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const [incident, setIncident] = useState<Incident | null>(null);
+    const [status, setStatus] = useState<string>('');
 
-    // Find the incident with the matching ID
-   // const incident = mockIncidents.find((inc) => inc.id === id);
+    useEffect(() => {
+        const fetchIncident = async () => {
+            try {
+                const response = await fetch('/api/incidentreports/${id}');
+                const data: Incident = await response.json();
+                setIncident(data);
+                setStatus(data.status);
+            } catch (error) {
+                console.error("Failed to fetch incident:", error);
+            }
+        };
+        fetchIncident();
+    }, [id]);
+
+
 
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -38,13 +53,7 @@ const IncidentDetailsPage: React.FC = () => {
                     ]}
                 />
 
-                {incident ? (
-                    <IncidentDetails incident={incident} />
-                ) : (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                        <CircularProgress />
-                    </Box>
-                )}
+            <IncidentDetails />
             </Container>
 
             <Footer />
