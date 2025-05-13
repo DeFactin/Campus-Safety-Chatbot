@@ -53,7 +53,7 @@ const IncidentDetailsPage: React.FC = () => {
                     ]}
                 />
 
-
+            <IncidentDetails />
             </Container>
 
             <Footer />

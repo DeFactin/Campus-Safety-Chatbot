@@ -100,9 +100,6 @@ const IncidentsList: React.FC = () => {
         }
     };
 
-
-     
-
     const getStatusIcon = (status: IncidentStatus) => {
         const color = getStatusColor(status);
         switch (status) {
