@@ -16,7 +16,7 @@ const UnauthorizedPage = () => {
                 backgroundPosition: 'center',
             }}
         >
-            <Typography variant="h3" sx={{ color: 'white' }}>
+            <Typography variant="h3" sx={{ color: 'grey' }}>
                 You have no access to this page. Please log in.
             </Typography>
             <Button

@@ -8,6 +8,9 @@ import HomePage from './pages/HomePage';
 import ReportPage from './pages/IncidentReportPage';
 import AdminDashboardPage from './pages/AdminPage';
 import IncidentDetailsPage from './pages/IncidentDetailsPage';
+import UnauthorizedPage from './pages/UnathorizedPage';
+import ProtectedRoute from './pages/ProtectedRoute';
+
 import ChatPage from './pages/ChatPage';
 function App() {
     return (
@@ -16,11 +19,25 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/report" element={<ReportPage />} />
-                    <Route path="/admin" element={<AdminDashboardPage />} />
-                    <Route path="/chat" element={<ChatPage />} />
-                    <Route path="/admin/incidents/:id" element={<IncidentDetailsPage />} />
-                    
+                    <Route path="/unauthorized" element={<UnauthorizedPage />} /> { }
+                    <Route path="/report" element={
+                        <ProtectedRoute requiredRole="User">
+                            <ReportPage />
+                        </ProtectedRoute>} />
+                    <Route path="/admin" element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <AdminDashboardPage />
+                        </ProtectedRoute>} />
+                    <Route path="/admin/incidents/:id" element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <IncidentDetailsPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/chat" element={
+                    <ProtectedRoute requiredRole="User">
+                        <ChatPage />
+                    </ProtectedRoute>} />
+
                 </Routes>
             </Router>
         </ThemeProvider>
