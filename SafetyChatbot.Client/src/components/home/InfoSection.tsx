@@ -125,7 +125,7 @@ const InfoSection: React.FC = () => {
 
                     <Box
                         component="img"
-                        src="../public/students.jpg"
+                        src="../students.jpg"
                         alt="Students using safety app on campus"
                         sx={{
                             width: '100%',

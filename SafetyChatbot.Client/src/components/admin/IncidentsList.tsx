@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Paper,
@@ -10,8 +10,6 @@ import {
     TableRow,
     TableCell,
     Chip,
-    IconButton,
-    Tooltip,
     TablePagination,
     TextField,
     InputAdornment,
@@ -20,20 +18,52 @@ import {
     FormControl,
     InputLabel,
     SelectChangeEvent,
-    useTheme
+    useTheme,
+    CircularProgress
 } from '@mui/material';
-import { Search, Eye, AlertCircle } from 'lucide-react';
-import { Link as RouterLink } from 'react-router-dom';
-import { mockIncidents } from '../../data/mockData';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+
+import { Search, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 import { Incident, IncidentStatus, SeverityLevel } from '../../types/incident';
+import { getIncidents } from '../../services/ApiService';
 
 const IncidentsList: React.FC = () => {
     const theme = useTheme();
+    const navigate = useNavigate();
+
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [severityFilter, setSeverityFilter] = useState<string>('all');
+
+    const [incidents, setIncidents] = useState<Incident[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await getIncidents();
+                setIncidents(data);
+            } catch (error) {
+                console.error('Failed to load incidents:', error);
+                setError('Failed to load incidents.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const handleRowClick = (incidentId: number) => {
+        navigate(`/admin/${incidentId}`);
+    };
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -61,14 +91,24 @@ const IncidentsList: React.FC = () => {
 
     const getStatusColor = (status: IncidentStatus) => {
         switch (status) {
-            case 'pending':
-                return 'warning';
-            case 'in_progress':
-                return 'primary';
-            case 'resolved':
-                return 'success';
+            case 'Pending': return theme.palette.warning.main;
+            case 'In Progress': return theme.palette.primary.main;
+            case 'Resolved': return theme.palette.success.main;
+            default: return theme.palette.grey[500];
+        }
+    };
+
+    const getStatusIcon = (status: IncidentStatus) => {
+        const color = getStatusColor(status);
+        switch (status) {
+            case 'Pending':
+                return <AccessTimeIcon sx={{ color }} />;
+            case 'In Progress':
+                return <AutorenewIcon sx={{ color }} />;
+            case 'Resolved':
+                return <CheckCircleIcon sx={{ color }} />;
             default:
-                return 'default';
+                return <HelpOutlineIcon sx={{ color }} />;
         }
     };
 
@@ -85,49 +125,46 @@ const IncidentsList: React.FC = () => {
         }
     };
 
-    const getFormattedStatus = (status: IncidentStatus) => {
-        switch (status) {
-            case 'pending':
-                return 'Pending';
-            case 'in_progress':
-                return 'In Progress';
-            case 'resolved':
-                return 'Resolved';
-            default:
-                return status;
-        }
-    };
+    const normalize = (str: string) => str.toLowerCase().replace(/\s+/g, '_');
 
-    const filteredIncidents = mockIncidents
-        .filter((incident) => {
-            const matchesSearch =
-                incident.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                incident.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                incident.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredIncidents = incidents.filter((incident) => {
+        const matchesSearch = [incident.incidentType, incident.location, incident.description]
+            .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()));
 
-            const matchesStatus = statusFilter === 'all' || incident.status === statusFilter;
-            const matchesSeverity = severityFilter === 'all' || incident.severityLevel === severityFilter;
+        const matchesStatus = statusFilter === 'all' || normalize(incident.status) === statusFilter;
+        const matchesSeverity = severityFilter === 'all' || normalize(incident.severity) === severityFilter;
 
-            return matchesSearch && matchesStatus && matchesSeverity;
-        });
+        return matchesSearch && matchesStatus && matchesSeverity;
+    });
 
-    const paginatedIncidents = filteredIncidents
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    const paginatedIncidents = filteredIncidents.slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+    );
+
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" p={4}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (error) {
+        return (
+            <Box display="flex" justifyContent="center" p={4}>
+                <Typography color="error">{error}</Typography>
+            </Box>
+        );
+    }
 
     return (
-        <Paper
-            elevation={0}
-            sx={{
-                p: 3,
-                borderRadius: 2,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            }}
-        >
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
             <Typography variant="h6" fontWeight={600} gutterBottom>
                 Incident Reports
             </Typography>
 
-            <Box sx={{ mb: 3, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, alignItems: { md: 'center' } }}>
+            <Box sx={{ mb: 3, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
                 <TextField
                     placeholder="Search incidents..."
                     value={searchTerm}
@@ -144,7 +181,7 @@ const IncidentsList: React.FC = () => {
                     }}
                 />
 
-                <Box sx={{ display: 'flex', gap: 2, width: { xs: '100%', md: 'auto' } }}>
+                <Box sx={{ display: 'flex', gap: 2 }}>
                     <FormControl size="small" sx={{ minWidth: 120 }}>
                         <InputLabel id="status-filter-label">Status</InputLabel>
                         <Select
@@ -181,67 +218,74 @@ const IncidentsList: React.FC = () => {
                 <Table sx={{ minWidth: 650 }} aria-label="incidents table">
                     <TableHead>
                         <TableRow>
+                            <TableCell>ID</TableCell>
                             <TableCell>Type</TableCell>
+                            <TableCell>Reported By</TableCell>
                             <TableCell>Location</TableCell>
                             <TableCell>Date</TableCell>
                             <TableCell>Severity</TableCell>
                             <TableCell>Status</TableCell>
-                            <TableCell align="right">Actions</TableCell>
+                            <TableCell>Description</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {paginatedIncidents.length > 0 ? (
-                            paginatedIncidents.map((incident: Incident) => (
+                            paginatedIncidents.map((incident) => (
                                 <TableRow
                                     key={incident.id}
+                                    hover
+                                    onClick={() => handleRowClick(incident.id)}
                                     sx={{
+                                        cursor: 'pointer',
                                         '&:hover': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                            cursor: 'pointer'
+                                            backgroundColor: 'rgba(0, 0, 0, 0.04)'
                                         }
                                     }}
                                 >
-                                    <TableCell component="th" scope="row">
-                                        {incident.type}
-                                    </TableCell>
+                                    <TableCell>{incident.id}</TableCell>
+                                    <TableCell>{incident.incidentType}</TableCell>
+                                    <TableCell>{incident.reportedBy || 'N/A'}</TableCell>
                                     <TableCell>{incident.location}</TableCell>
-                                    <TableCell>{new Date(incident.date).toLocaleString()}</TableCell>
                                     <TableCell>
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <AlertCircle
-                                                size={16}
-                                                color={getSeverityColor(incident.severityLevel)}
-                                                style={{ marginRight: '6px' }}
-                                            />
-                                            <Typography variant="body2">
-                                                {incident.severityLevel.charAt(0).toUpperCase() + incident.severityLevel.slice(1)}
-                                            </Typography>
-                                        </Box>
+                                        {new Date(incident.date).toLocaleDateString(undefined, {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
                                     </TableCell>
                                     <TableCell>
                                         <Chip
-                                            label={getFormattedStatus(incident.status)}
-                                            color={getStatusColor(incident.status) as "warning" | "primary" | "success" | "default"}
+                                            label={incident.severity}
                                             size="small"
+                                            sx={{
+                                                backgroundColor: getSeverityColor(incident.severity),
+                                                color: '#fff',
+                                                textTransform: 'capitalize',
+                                            }}
                                         />
                                     </TableCell>
-                                    <TableCell align="right">
-                                        <Tooltip title="View Details">
-                                            <IconButton
-                                                component={RouterLink}
-                                                to={`/admin/incidents/${incident.id}`}
-                                                size="small"
-                                                color="primary"
-                                            >
-                                                <Eye size={18} />
-                                            </IconButton>
-                                        </Tooltip>
+                                    <TableCell>
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            <Typography variant="body2">{incident.status}</Typography>
+                                            {getStatusIcon(incident.status)}
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell sx={{ maxWidth: 200 }}>
+                                        <Typography
+                                            variant="body2"
+                                            noWrap
+                                            sx={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
+                                        >
+                                            {incident.description}
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                                <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
                                     <Typography variant="body1" color="text.secondary">
                                         No incidents found matching your filters.
                                     </Typography>
