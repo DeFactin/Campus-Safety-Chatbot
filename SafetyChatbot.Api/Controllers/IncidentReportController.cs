@@ -9,6 +9,7 @@ using SafetyChatbot.Domain.Models;
 using SafetyChatbot.Infrastructure;
 using SafetyChatbot.Infrastructure.Repositories;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SafetyChatbot.Api.Controllers
 {
@@ -16,8 +17,7 @@ namespace SafetyChatbot.Api.Controllers
 
     [ApiController]
     [Route("api/incidentreports")]
-
-
+    
     public class IncidentReportController: ControllerBase
     {
         private readonly IIncidentReportRepository _incidentReportRepository;
@@ -30,7 +30,7 @@ namespace SafetyChatbot.Api.Controllers
             _incidentReportRepository = IncidentReportRepository;
             _mapper = mapper;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public ActionResult<IEnumerable<IncidentReportDto>> GetAll()
         {
@@ -39,7 +39,7 @@ namespace SafetyChatbot.Api.Controllers
             return Ok(reportsDto);
         }
 
-      
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public ActionResult<IncidentReportDto> GetById(int id)
         {
@@ -51,6 +51,7 @@ namespace SafetyChatbot.Api.Controllers
             return Ok(reportDto);
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult<IncidentReportDto> Submit([FromBody] SubmitIncidentReportDto dto)
         {
@@ -61,7 +62,7 @@ namespace SafetyChatbot.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public ActionResult<IncidentReportDto> Update(int id, [FromBody] SubmitIncidentReportDto dto)
         {
@@ -76,7 +77,7 @@ namespace SafetyChatbot.Api.Controllers
             return Ok(resultDto);
         }
 
-        
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

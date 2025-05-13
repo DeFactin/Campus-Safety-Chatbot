@@ -20,7 +20,7 @@ public class SafetyRegulationsController : ControllerBase
     {
         return await _context.SafetyRegulations.ToListAsync();
     }
-
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<SafetyRegulation>> Post([FromBody] SafetyRegulation regulation)
     {

@@ -1,7 +1,7 @@
-﻿import React, { JSX, useState } from 'react';
+﻿import React, { JSX } from 'react';
 import { Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { Snackbar } from '@mui/material';
+import Cookies from 'js-cookie';  // Import js-cookie
 
 type Props = {
     children: JSX.Element;
@@ -16,10 +16,8 @@ type DecodedToken = {
 };
 
 const ProtectedRoute: React.FC<Props> = ({ children, requiredRole }) => {
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
 
-    const token = localStorage.getItem('token');
+    const token = Cookies.get('token');
 
     if (!token) {
         return <Navigate to="/unauthorized" replace />;
@@ -30,37 +28,24 @@ const ProtectedRoute: React.FC<Props> = ({ children, requiredRole }) => {
         const isExpired = decoded.exp * 1000 < Date.now();
 
         if (isExpired) {
-            localStorage.removeItem('token');
-            setSnackbarMessage('Sesija je istekla. Prijavite se ponovo.');
-            setOpenSnackbar(true);
+            Cookies.remove('token');
             return <Navigate to="/unauthorized" replace />;
         }
 
         const userRole = decoded["role"];
 
         if (userRole !== requiredRole && requiredRole !== 'User') {
-            setSnackbarMessage('Nemate ovlasti za pristup ovoj stranici.');
-            setOpenSnackbar(true);
             return <Navigate to="/unauthorized" replace />;
         }
 
         return (
             <>
                 {children}
-                <Snackbar
-                    open={openSnackbar}
-                    autoHideDuration={4000}
-                    onClose={() => setOpenSnackbar(false)}
-                    message={snackbarMessage}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                />
             </>
         );
     } catch (error) {
-        console.error('Token nije validan:', error);
-        localStorage.removeItem('token');
-        setSnackbarMessage('Sesija nije valjana. Prijavite se ponovo.');
-        setOpenSnackbar(true);
+        console.error('Token not valid:', error);
+        Cookies.remove('token');
         return <Navigate to="/unauthorized" replace />;
     }
 };
