@@ -12,6 +12,6 @@ export interface Incident {
     status: IncidentStatus;
     description: string;
     reportedAt?: string;
-    updatedAt?: string;
+    lastUpdated?: string;
     
 }

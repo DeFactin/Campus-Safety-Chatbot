@@ -69,6 +69,8 @@ namespace SafetyChatbot.Api.Controllers
             if (existing == null)
                 return NotFound();
 
+            existing.LastUpdated = DateTime.UtcNow;
+
             _mapper.Map(dto, existing);
             _incidentReportRepository.Update(id, existing);
 
