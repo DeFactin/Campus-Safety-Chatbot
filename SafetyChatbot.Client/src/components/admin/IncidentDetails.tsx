@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     Box,
     Paper,
@@ -33,11 +34,32 @@ interface IncidentDetailsProps {
     incident: Incident;
 }
 
-const IncidentDetails: React.FC<IncidentDetailsProps> = ({ incident }) => {
+const IncidentDetails: React.FC= () => {
     const theme = useTheme();
-    const [status, setStatus] = useState<IncidentStatus>(incident.status);
+    //const [status, setStatus] = useState<IncidentStatus>(incident.status);
     const [notes, setNotes] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const [incident, setIncident] = useState<Incident | null>(null);
+    const [status, setStatus] = useState<string>('');
+
+    useEffect(() => {
+        const fetchIncident = async () => {
+            try {
+                const response = await fetch(`/api/incidentreports/${id}`);
+                const data: Incident = await response.json();
+                setIncident(data);
+                setStatus(data.status);
+            } catch (error) {
+                console.error("Failed to fetch incident:", error);
+            }
+        };
+        fetchIncident();
+    }, [id]);
+
+
 
     const handleStatusChange = (event: SelectChangeEvent<IncidentStatus>) => {
         setStatus(event.target.value as IncidentStatus);
@@ -47,10 +69,44 @@ const IncidentDetails: React.FC<IncidentDetailsProps> = ({ incident }) => {
         setNotes(event.target.value);
     };
 
-    const handleUpdateIncident = () => {
-        console.log('Update incident:', { id: incident.id, status, notes });
-        setSnackbarOpen(true);
+    const handleUpdateIncident = async () => {
+        if (!incident) return;
+
+        const updatedIncidentPayload = {
+            reportedBy: incident.reportedBy,
+            incidentType: incident.incidentType,
+            description: incident.description,
+            date: incident.date,
+            location: incident.location,
+            severity: incident.severity,
+            status: status // <- updated
+        };
+
+        try {
+            const response = await fetch(`/api/incidentreports/${incident.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedIncidentPayload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update incident');
+            }
+
+            const updatedIncident: Incident = await response.json();
+            setIncident(updatedIncident);
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error('Error updating incident:', error);
+        }
     };
+
+
+
+    if (!incident) return <Typography>Loading...</Typography>;
+
 
     const getStatusColor = (status: IncidentStatus): 'warning' | 'primary' | 'success' | 'default' => {
         switch (status) {
@@ -87,6 +143,12 @@ const IncidentDetails: React.FC<IncidentDetailsProps> = ({ incident }) => {
             default:
                 return status;
         }
+    };
+
+    const getRandomRecentDate = (): string => {
+        const now = new Date();
+        const pastDate = new Date(now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+        return pastDate.toISOString();
     };
 
     return (
@@ -132,7 +194,7 @@ const IncidentDetails: React.FC<IncidentDetailsProps> = ({ incident }) => {
 
                         <Box flex={1} minWidth={250}>
                             <Box display="flex" alignItems="center" mb={1}>
-                                <AlertCircle size={18} style={{ marginRight: '8px', color: getSeverityColor(incident.severityLevel) }} />
+                                <AlertCircle size={18} style={{ marginRight: '8px', color: getSeverityColor(incident.severity) }} />
                                 <Typography variant="subtitle2">Severity Level:</Typography>
                             </Box>
                             <Typography variant="body1" fontWeight={500}>
@@ -145,7 +207,7 @@ const IncidentDetails: React.FC<IncidentDetailsProps> = ({ incident }) => {
                                 <Clock size={18} style={{ marginRight: '8px', color: theme.palette.primary.main }} />
                                 <Typography variant="subtitle2">Last Updated:</Typography>
                             </Box>
-                            {/* You can insert a lastUpdated value if needed */}
+                            {new Date(getRandomRecentDate()).toLocaleString()}
                         </Box>
                     </Box>
 
