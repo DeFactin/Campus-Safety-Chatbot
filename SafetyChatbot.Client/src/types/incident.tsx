@@ -11,4 +11,7 @@ export interface Incident {
     severity: SeverityLevel;
     status: IncidentStatus;
     description: string;
+    reportedAt?: string;
+    updatedAt?: string;
+    
 }
