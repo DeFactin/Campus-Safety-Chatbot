@@ -207,7 +207,7 @@ const IncidentDetails: React.FC= () => {
                                 <Clock size={18} style={{ marginRight: '8px', color: theme.palette.primary.main }} />
                                 <Typography variant="subtitle2">Last Updated:</Typography>
                             </Box>
-                            {new Date(getRandomRecentDate()).toLocaleString()}
+                            {new Date(incident.lastUpdated).toLocaleString()}
                         </Box>
                     </Box>
 
