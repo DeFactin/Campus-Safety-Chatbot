@@ -10,8 +10,6 @@ import {
     TableRow,
     TableCell,
     Chip,
-    IconButton,
-    Tooltip,
     TablePagination,
     TextField,
     InputAdornment,
@@ -28,7 +26,7 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
-import { Search, Eye, AlertCircle } from 'lucide-react';
+import { Search, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { Incident, IncidentStatus, SeverityLevel } from '../../types/incident';
@@ -63,7 +61,7 @@ const IncidentsList: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleViewClick = (incidentId: number) => {
+    const handleRowClick = (incidentId: number) => {
         navigate(`/admin/${incidentId}`);
     };
 
@@ -114,7 +112,6 @@ const IncidentsList: React.FC = () => {
         }
     };
 
-
     const getSeverityColor = (severity: SeverityLevel) => {
         switch (severity) {
             case 'high':
@@ -127,7 +124,6 @@ const IncidentsList: React.FC = () => {
                 return theme.palette.grey[500];
         }
     };
-
 
     const normalize = (str: string) => str.toLowerCase().replace(/\s+/g, '_');
 
@@ -215,7 +211,6 @@ const IncidentsList: React.FC = () => {
                             <MenuItem value="low">Low</MenuItem>
                         </Select>
                     </FormControl>
-
                 </Box>
             </Box>
 
@@ -231,7 +226,6 @@ const IncidentsList: React.FC = () => {
                             <TableCell>Severity</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Description</TableCell>
-                            <TableCell align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -239,10 +233,12 @@ const IncidentsList: React.FC = () => {
                             paginatedIncidents.map((incident) => (
                                 <TableRow
                                     key={incident.id}
+                                    hover
+                                    onClick={() => handleRowClick(incident.id)}
                                     sx={{
+                                        cursor: 'pointer',
                                         '&:hover': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                            cursor: 'pointer'
+                                            backgroundColor: 'rgba(0, 0, 0, 0.04)'
                                         }
                                     }}
                                 >
@@ -270,16 +266,11 @@ const IncidentsList: React.FC = () => {
                                             }}
                                         />
                                     </TableCell>
-                                    
                                     <TableCell>
-                                       
-                                            <Box display="flex" alignItems="center" gap={1}>
-                                            
+                                        <Box display="flex" alignItems="center" gap={1}>
                                             <Typography variant="body2">{incident.status}</Typography>
                                             {getStatusIcon(incident.status)}
                                         </Box>
-
-                                        
                                     </TableCell>
                                     <TableCell sx={{ maxWidth: 200 }}>
                                         <Typography
@@ -290,22 +281,11 @@ const IncidentsList: React.FC = () => {
                                             {incident.description}
                                         </Typography>
                                     </TableCell>
-                                    <TableCell align="right">
-                                        <Tooltip title="View Details">
-                                            <IconButton
-                                                onClick={() => handleViewClick(incident.id)}
-                                                size="small"
-                                                color="primary"
-                                            >
-                                                <Eye size={18} />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                                <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
                                     <Typography variant="body1" color="text.secondary">
                                         No incidents found matching your filters.
                                     </Typography>
