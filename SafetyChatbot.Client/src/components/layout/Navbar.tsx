@@ -79,12 +79,11 @@ const Navbar: React.FC = () => {
     // Only show Home for non-logged in users
     const getNavItems = () => {
         if (!username) {
-            return [{ name: 'Home', path: '/' }];
+            return [{}];
         }
         return [
             { name: 'Home', path: '/' },
             { name: 'Report Incident', path: '/report' },
-            { name: 'Safety Regulations', path: '/regulations' },
             ...(role === 'Admin' ? [{ name: 'Admin Dashboard', path: '/admin' }] : [])
         ];
     };
