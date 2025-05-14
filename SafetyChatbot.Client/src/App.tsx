@@ -38,9 +38,6 @@ function App() {
                         <ChatPage />
                     </ProtectedRoute>} />
 
-                    <Route path="/report" element={<ReportPage />} />
-                    <Route path="/admin" element={<AdminDashboardPage />} />
-                    <Route path="/chat" element={<ChatPage />} />
                     <Route path="/admin/:id" element={<IncidentDetailsPage />} />
                     
                 </Routes>

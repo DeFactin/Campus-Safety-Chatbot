@@ -101,6 +101,10 @@ const IncidentDetails: React.FC= () => {
         } catch (error) {
             console.error('Error updating incident:', error);
         }
+
+        useEffect(() => {
+            window.scrollTo(0, 0);
+        }, []);
     };
 
 

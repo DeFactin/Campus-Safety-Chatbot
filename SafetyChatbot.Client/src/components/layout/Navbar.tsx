@@ -12,11 +12,13 @@ import {
     ListItemText,
     Container,
     useMediaQuery,
-    useTheme
+    useTheme,
+    Avatar,
+    Chip,
+    Divider
 } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Menu, X } from 'lucide-react';
-import PersonIcon from '@mui/icons-material/Person';
+import { Menu, X, LogOut } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 
@@ -27,22 +29,15 @@ type DecodedToken = {
     exp: number;
 };
 
-const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Report Incident', path: '/report' },
-    { name: 'Safety Regulations', path: '/regulations' },
-    { name: 'Admin Dashboard', path: '/admin' },
-];
-
 const Navbar: React.FC = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const [username, setUsername] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
-    const location = useLocation();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -56,7 +51,7 @@ const Navbar: React.FC = () => {
                 setUsername(cleanName);
                 setRole(decoded.role);
             } catch (err) {
-                console.error('Neispravan token:', err);
+                console.error('Invalid token:', err);
             }
             navigate(location.pathname, { replace: true });
         } else {
@@ -74,106 +69,116 @@ const Navbar: React.FC = () => {
         }
     }, [location, navigate]);
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
-
+    const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
     const handleLogout = () => {
         Cookies.remove('token');
         navigate('/');
         window.location.reload();
     };
 
-    const filteredNavItems = navItems.filter(
-        item => item.name !== 'Admin Dashboard' || role === 'Admin'
-    );
+    // Only show Home for non-logged in users
+    const getNavItems = () => {
+        if (!username) {
+            return [{ name: 'Home', path: '/' }];
+        }
+        return [
+            { name: 'Home', path: '/' },
+            { name: 'Report Incident', path: '/report' },
+            { name: 'Safety Regulations', path: '/regulations' },
+            ...(role === 'Admin' ? [{ name: 'Admin Dashboard', path: '/admin' }] : [])
+        ];
+    };
+
+    const navItems = getNavItems();
 
     const drawer = (
-        <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-                <Typography variant="h6" component="div" sx={{ color: 'primary.main', fontWeight: 700 }}>
+        <Box sx={{ width: 280 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 3 }}>
+                <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 700 }}>
                     IUS Campus Safety Chatbot
                 </Typography>
-                <IconButton color="primary">
+                <IconButton onClick={handleDrawerToggle}>
                     <X size={24} />
                 </IconButton>
             </Box>
+            <Divider />
             <List>
-                {username ? (
-                    <>
-                        {filteredNavItems.map((item) => (
-                            <ListItem
-                                key={item.name}
-                                component={RouterLink}
-                                to={item.path}
-                                sx={{
-                                    textAlign: 'center',
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(33, 61, 115, 0.08)',
-                                    }
-                                }}
-                            >
-                                <ListItemText
-                                    primary={item.name}
-                                    sx={{
-                                        color: 'text.primary',
-                                        '.MuiListItemText-primary': {
-                                            fontWeight: 500,
-                                        }
-                                    }}
-                                />
-                            </ListItem>
-                        ))}
-                        <ListItem
-                            button
-                            onClick={handleLogout}
-                            sx={{
-                                textAlign: 'center',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                                }
-                            }}
-                        >
-                            <ListItemText
-                                primary="Log Out"
-                                sx={{
-                                    color: 'error.main',
-                                    '.MuiListItemText-primary': {
-                                        fontWeight: 600,
-                                    }
-                                }}
-                            />
-                        </ListItem>
-                    </>
-                ) : (
+                {navItems.map((item) => (
                     <ListItem
-                        component="a"
-                        href="https://localhost:7084/signin"
+                        key={item.name}
+                        component={RouterLink}
+                        to={item.path}
+                        selected={location.pathname === item.path}
                         sx={{
-                            textAlign: 'center',
-                            '&:hover': {
+                            px: 3,
+                            '&.Mui-selected': {
                                 backgroundColor: 'rgba(33, 61, 115, 0.08)',
+                                borderLeft: `3px solid ${theme.palette.primary.main}`
+                            },
+                            '&:hover': {
+                                backgroundColor: 'rgba(33, 61, 115, 0.04)'
                             }
                         }}
                     >
                         <ListItemText
-                            primary="Log In"
-                            sx={{
-                                color: 'text.primary',
-                                '.MuiListItemText-primary': {
-                                    fontWeight: 500,
-                                }
-                            }}
+                            primary={item.name}
+                            primaryTypographyProps={{ fontWeight: 500 }}
                         />
                     </ListItem>
-                )}
+                ))}
             </List>
+            <Divider />
+            <Box sx={{ p: 3 }}>
+                {username ? (
+                    <>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+                                {username.charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Box>
+                                <Typography fontWeight={600}>{username}</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {role === 'Admin' ? 'Administrator' : 'User'}
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            color="error"
+                            startIcon={<LogOut size={18} />}
+                            onClick={handleLogout}
+                            sx={{ mt: 2 }}
+                        >
+                            Sign Out
+                        </Button>
+                    </>
+                ) : (
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        color="error" // Changed to error (red)
+                        href="https://localhost:7084/signin"
+                        sx={{ mt: 2 }}
+                    >
+                        Log In {/* Changed text to Log In */}
+                    </Button>
+                )}
+            </Box>
         </Box>
     );
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="fixed" color="default" elevation={10} sx={{ backgroundColor: 'white' }}>
+            <AppBar
+                position="fixed"
+                color="default"
+                elevation={1}
+                sx={{
+                    backgroundColor: 'background.paper',
+                    borderBottom: `1px solid ${theme.palette.divider}`
+                }}
+            >
                 <Container maxWidth="xl">
                     <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1, sm: 2 } }}>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -181,18 +186,18 @@ const Navbar: React.FC = () => {
                                 component="img"
                                 src="/logoDark.png"
                                 alt="Logo"
-                                sx={{ height: '36px', width: 'auto' }}
+                                sx={{ height: 36, width: 'auto' }}
                             />
                             <Typography
                                 variant="h6"
                                 component={RouterLink}
                                 to="/"
                                 sx={{
-                                    ml: 1.5,
+                                    ml: 2,
                                     fontWeight: 700,
                                     color: 'primary.main',
                                     textDecoration: 'none',
-                                    display: { xs: 'none', sm: 'block' }
+                                    display: { xs: 'none', md: 'block' }
                                 }}
                             >
                                 IUS Campus Safety Chatbot
@@ -201,86 +206,104 @@ const Navbar: React.FC = () => {
 
                         {isMobile ? (
                             <IconButton
-                                color="primary"
-                                aria-label="open drawer"
-                                edge="end"
+                                color="inherit"
                                 onClick={handleDrawerToggle}
+                                sx={{ color: 'text.primary' }}
                             >
                                 <Menu />
                             </IconButton>
-                        ) : username ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                {filteredNavItems.map((item) => (
+                        ) : (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                {navItems.map((item) => (
                                     <Button
                                         key={item.name}
                                         component={RouterLink}
                                         to={item.path}
                                         sx={{
-                                            color: 'text.primary',
-                                            mx: 1,
+                                            color: location.pathname === item.path
+                                                ? 'primary.main'
+                                                : 'text.secondary',
+                                            fontWeight: location.pathname === item.path ? 600 : 500,
                                             '&:hover': {
-                                                backgroundColor: 'rgba(33, 61, 115, 0.08)',
+                                                color: 'primary.main',
+                                                backgroundColor: 'rgba(33, 61, 115, 0.04)'
                                             }
                                         }}
                                     >
                                         {item.name}
                                     </Button>
                                 ))}
-                                <Typography sx={{ mx: 2, fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                                    <PersonIcon sx={{ mr: 0.5 }} />
-                                    {role === 'Admin' ? 'Admin' : 'User'} {username}
-                                </Typography>
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    onClick={handleLogout}
-                                    sx={{
-                                        ml: 1,
-                                        px: 3,
-                                        transition: 'all 0.3s',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                        }
-                                    }}
-                                >
-                                    Log Out
-                                </Button>
+
+                                {username ? (
+                                    <>
+                                            <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 40 }} />
+                                            <Chip
+                                                avatar={
+                                                    <Avatar sx={{
+                                                        bgcolor: 'warning.main',                                                       
+                                                    }}>
+                                                        {username.charAt(0).toUpperCase()}
+                                                    </Avatar>
+                                                }
+                                                label={
+                                                    <Box>
+                                                        <Typography variant="subtitle2">{username}</Typography>
+                                                        <Typography variant="caption" color="text.secondary">
+                                                            {role}
+                                                        </Typography>
+                                                    </Box>
+                                                }
+                                               
+                                                sx={{
+                                                   
+                                                    backgroundColor: 'white',
+                                                    '.MuiChip-label': { pr: 1 }
+                                                }}
+                                            />
+                                        <IconButton
+                                            color="error"
+                                            onClick={handleLogout}
+                                            sx={{
+                                                ml: 1,
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(244, 67, 54, 0.08)'
+                                                }
+                                            }}
+                                        >
+                                            <LogOut size={20} />
+                                        </IconButton>
+                                    </>
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        href="https://localhost:7084/signin"
+                                        sx={{ ml: 2 }}
+                                    >
+                                        Log In {/* Changed text to Log In */}
+                                    </Button>
+                                )}
                             </Box>
-                        ) : (
-                            <Button
-                                variant="contained"
-                                color="error"
-                                href="https://localhost:7084/signin"
-                                sx={{
-                                    ml: 2,
-                                    px: 3,
-                                    transition: 'all 0.3s',
-                                    '&:hover': {
-                                        transform: 'translateY(-2px)',
-                                    }
-                                }}
-                            >
-                                Log In
-                            </Button>
                         )}
                     </Toolbar>
                 </Container>
             </AppBar>
+
             <Drawer
                 anchor="right"
                 open={mobileOpen}
                 onClose={handleDrawerToggle}
-                ModalProps={{
-                    keepMounted: true,
-                }}
                 sx={{
-                    display: { xs: 'block', md: 'none' },
-                    '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
+                    '& .MuiDrawer-paper': {
+                        width: 280,
+                        boxSizing: 'border-box',
+                    },
                 }}
             >
                 {drawer}
             </Drawer>
-            <Toolbar />
+
+            <Toolbar /> {/* Spacer for content */}
         </Box>
     );
 };
