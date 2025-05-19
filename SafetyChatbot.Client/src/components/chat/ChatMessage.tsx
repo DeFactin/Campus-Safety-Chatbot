@@ -25,6 +25,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                     flexDirection: isBot ? 'row' : 'row-reverse',
                     alignItems: 'flex-start',
                     maxWidth: '80%',
+                    gap: 1.5, // cleaner spacing between avatar and bubble
                 }}
             >
                 <Box
@@ -32,16 +33,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: 32,
-                        height: 32,
+                        minWidth: 36,
+                        minHeight: 36,
                         borderRadius: '50%',
                         bgcolor: isBot ? 'primary.main' : 'warning.main',
                         color: 'white',
-                        mr: isBot ? 1 : 0,
-                        ml: isBot ? 0 : 1,
+                        flexShrink: 0, // prevents squishing on long messages
                     }}
                 >
-                    {isBot ? <Bot size={18} /> : <User size={18} />}
+                    {isBot ? <Bot size={20} /> : <User size={20} />}
                 </Box>
 
                 <Paper
@@ -51,17 +51,19 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                         bgcolor: isBot ? 'grey.100' : 'primary.main',
                         color: isBot ? 'text.primary' : 'white',
                         borderRadius: 2,
+                        wordBreak: 'break-word',
                         maxWidth: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
                     }}
                 >
                     <Typography variant="body1">{message.text}</Typography>
                     <Typography
                         variant="caption"
                         sx={{
-                            display: 'block',
                             mt: 1,
                             color: isBot ? 'text.secondary' : 'rgba(255, 255, 255, 0.7)',
-                            textAlign: isBot ? 'left' : 'right'
+                            alignSelf: isBot ? 'flex-start' : 'flex-end',
                         }}
                     >
                         {message.timestamp.toLocaleTimeString()}

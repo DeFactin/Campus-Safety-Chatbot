@@ -6,6 +6,8 @@ using SafetyChatbot.Infrastructure.Repositories;
 using Microsoft.Identity.Web;
 using System.Security.Authentication;
 using SafetyChatbot.Domain.Models;
+using SafetyChatbot.Application.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,11 @@ builder.Services.AddCors(options =>
                         .AllowAnyHeader());
 });
 
+// Register DialogflowService
+var projectId = "campussafetychatbot-pom9";
+
+builder.Services.AddSingleton<IDialogflowService>(provider =>
+    new DialogflowService(projectId));
 
 var app = builder.Build();
 
