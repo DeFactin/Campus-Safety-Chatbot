@@ -17,6 +17,13 @@ import { Message } from '../../types/chat';
 import { sendChatMessage } from '../../services/ApiService';
 import ChatMessage from './ChatMessage';
 import ChatSuggestions from './ChatSuggestions';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
+
+interface DecodedToken {
+    name: string;
+    role: string;
+}
 
 const initialSuggestions = [
     "How do I report an emergency?",
@@ -29,6 +36,19 @@ const initialSuggestions = [
 
 const ChatInterface: React.FC = () => {
     const theme = useTheme();
+    const [username, setUsername] = useState<string | null>(null);
+    useEffect(() => {
+        const storedToken = Cookies.get('token');
+        if (storedToken) {
+            try {
+                const decoded: DecodedToken = jwtDecode(storedToken);
+                const cleanName = decoded.name.split(' ')[0];
+                setUsername(cleanName);
+            } catch (err) {
+                Cookies.remove('token');
+            }
+        }
+    }, []);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: uuidv4(),
@@ -104,7 +124,7 @@ const ChatInterface: React.FC = () => {
                 <Paper elevation={0} sx={{ height: '70vh', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
                     <Box sx={{ flex: 1, overflowY: 'auto', p: 3, bgcolor: 'background.default' }}>
                         {messages.map((message) => (
-                            <ChatMessage key={message.id} message={message} />
+                            <ChatMessage key={message.id} message={message} username={username}/>
                         ))}
                         <div ref={messagesEndRef} />
                     </Box>

@@ -5,9 +5,10 @@ import { Bot, User } from 'lucide-react';
 
 interface ChatMessageProps {
     message: Message;
+    username: string | null;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, username }) => {
     const theme = useTheme();
     const isBot = message.sender === 'bot';
 
@@ -41,7 +42,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                         flexShrink: 0, // prevents squishing on long messages
                     }}
                 >
-                    {isBot ? <Bot size={20} /> : <User size={20} />}
+                    {isBot ? (
+                        <Bot size={20} />
+                    ) : (
+                        <Typography variant="body2" fontWeight={600}>
+                            {username? username.charAt(0).toUpperCase() : '?'}
+                        </Typography>
+                    )}
                 </Box>
 
                 <Paper
