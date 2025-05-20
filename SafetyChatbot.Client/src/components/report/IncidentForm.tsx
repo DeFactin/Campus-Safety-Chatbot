@@ -19,6 +19,8 @@ import {
 } from '@mui/material';
 import { Upload, Clock, AlertCircle, Check } from 'lucide-react';
 import { SeverityLevel } from '../../types/incident';
+import Cookies from 'js-cookie';
+
 
 const incidentTypes = [
     'Theft',
@@ -54,14 +56,23 @@ const IncidentForm: React.FC = () => {
     const [submitted, setSubmitted] = useState(false);
     const steps = ['Incident Details', 'Additional Information', 'Review & Submit'];
 
+    const getTokenFromCookie = () => {
+        const tokenMatch = document.cookie.match(/(^| )token=([^;]+)/);
+        return tokenMatch ? tokenMatch[2] : null;
+    };
+
+    const token = getTokenFromCookie();
+
     const [formData, setFormData] = useState({
-        type: '',
-        location: '',
-        date: '',
-        description: '',
-        severityLevel: '' as SeverityLevel,
-        evidenceFile: '',
+        reportedBy: '',       
+        incidentType: '',     
+        status: 'Pending',           
+        description: '',      
+        date: '',            
+        location: '',         
+        severity: '',         
     });
+
 
     const [errors, setErrors] = useState({
         type: false,
@@ -72,7 +83,9 @@ const IncidentForm: React.FC = () => {
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+        
         const { name, value } = e.target;
+        console.log("handle input change" + name + value);
         setFormData({
             ...formData,
             [name as string]: value
@@ -99,8 +112,8 @@ const IncidentForm: React.FC = () => {
         const newErrors = { ...errors };
 
         if (activeStep === 0) {
-            if (!formData.type) {
-                newErrors.type = true;
+            if (!formData.incidentType) {
+                newErrors.incidentType = true;
                 isValid = false;
             }
             if (!formData.location) {
@@ -116,8 +129,8 @@ const IncidentForm: React.FC = () => {
                 newErrors.description = true;
                 isValid = false;
             }
-            if (!formData.severityLevel) {
-                newErrors.severityLevel = true;
+            if (!formData.severity) {
+                newErrors.severity = true;
                 isValid = false;
             }
         }
@@ -130,6 +143,7 @@ const IncidentForm: React.FC = () => {
         if (validateStep()) {
             if (activeStep === steps.length - 1) {
                 handleSubmit();
+
             } else {
                 setActiveStep((prevStep) => prevStep + 1);
             }
@@ -140,11 +154,34 @@ const IncidentForm: React.FC = () => {
         setActiveStep((prevStep) => prevStep - 1);
     };
 
-    const handleSubmit = () => {
-        // Submit logic would go here (API call, etc.)
-        console.log("Form submitted:", formData);
+    const handleSubmit = async () => {
+        try {
+            console.log(JSON.stringify(formData));
+            console.log(token);
+            console.log("nesto1");
+
+            const response = await fetch('/api/incidentreports', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            console.log("nesto2");
+            if (response.ok) {
+                const result = await response.json();
+                console.log("Submitted successfully:", result);
+            } else {
+                console.error("Failed to submit:", response.statusText);
+            }
+        } catch (error) {
+            console.error("Error during submission:", error);
+        }
+
         setSubmitted(true);
     };
+
 
     const getSeverityColor = (severity: SeverityLevel) => {
         switch (severity) {
@@ -191,12 +228,13 @@ const IncidentForm: React.FC = () => {
                             setSubmitted(false);
                             setActiveStep(0);
                             setFormData({
-                                type: '',
-                                location: '',
-                                date: '',
+                                reportedBy: '',
+                                incidentType: '',
+                                status: 'Pending',
                                 description: '',
-                                severityLevel: '' as SeverityLevel,
-                                evidenceFile: '',
+                                date: '',
+                                location: '',
+                                severity: '',
                             });
                         }}
                         sx={{ mt: 2 }}
@@ -240,8 +278,8 @@ const IncidentForm: React.FC = () => {
                                 <Select
                                     labelId="incident-type-label"
                                     id="incident-type"
-                                    name="type"
-                                    value={formData.type}
+                                    name="incidentType"
+                                    value={formData.incidentType}
                                     label="Incident Type *"
                                     onChange={handleInputChange}
                                 >
@@ -325,14 +363,14 @@ const IncidentForm: React.FC = () => {
                                 <Select
                                     labelId="severity-label"
                                     id="severityLevel"
-                                    name="severityLevel"
-                                    value={formData.severityLevel}
+                                    name="severity"
+                                    value={formData.severity}
                                     label="Severity Level *"
                                     onChange={handleInputChange}
-                                    startAdornment={formData.severityLevel ? (
+                                    startAdornment={formData.severity ? (
                                         <AlertCircle
                                             size={18}
-                                            color={getSeverityColor(formData.severityLevel)}
+                                            color={getSeverityColor(formData.severity)}
                                             style={{ marginRight: '8px' }}
                                         />
                                     ) : undefined}
@@ -422,11 +460,11 @@ const IncidentForm: React.FC = () => {
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <AlertCircle
                                         size={18}
-                                        color={getSeverityColor(formData.severityLevel)}
+                                        color={getSeverityColor(formData.severity)}
                                         style={{ marginRight: '8px' }}
                                     />
                                     <Typography variant="body1" fontWeight={500} paragraph>
-                                        {formData.severityLevel.charAt(0).toUpperCase() + formData.severityLevel.slice(1)}
+                                        {formData.severity.charAt(0).toUpperCase() + formData.severity.slice(1)}
                                     </Typography>
                                 </Box>
                             </Box>
