@@ -29,12 +29,117 @@ import {
     Check
 } from 'lucide-react';
 import { Incident, IncidentStatus, SeverityLevel } from '../../types/incident';
+import { jsPDF } from "jspdf";
 
 interface IncidentDetailsProps {
     incident: Incident;
 }
+const loadLogoAsBase64 = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // Bitno za lokalne slike
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0);
+      const dataURL = canvas.toDataURL("image/png");
+      resolve(dataURL);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+};
 
-const IncidentDetails: React.FC= () => {
+
+const IncidentDetails: React.FC = () => {
+
+    const handlePrintReport = async () => {
+        if (!incident) return;
+
+        const doc = new jsPDF();
+        const marginLeft = 20;
+        const topMargin = 20;
+        const lineSpacing = 8;
+
+        // Font i velièina
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+
+        // Pripremi logo
+        let logoHeight = 0;
+        try {
+            const logo = new Image();
+            logo.src = "/logoDark.png";
+            await new Promise((res, rej) => {
+                logo.onload = res;
+                logo.onerror = rej;
+            });
+
+            const targetHeight = 20; // visina da odgovara tekstu
+            const aspectRatio = logo.width / logo.height;
+            const logoWidth = targetHeight * aspectRatio;
+            logoHeight = targetHeight;
+
+            const xLogo = 190 - logoWidth; // desno poravnato
+            doc.addImage(logo, "PNG", xLogo, topMargin, logoWidth, logoHeight);
+        } catch (error) {
+            console.error("Logo nije uèitan:", error);
+        }
+
+        // Naslov u liniji s logom
+        doc.text("Incident Report", marginLeft, topMargin + logoHeight * 0.8);
+
+        // Linija ispod
+        const yLine = topMargin + logoHeight + 4;
+        doc.setLineWidth(0.5);
+        doc.line(marginLeft, yLine, 190, yLine);
+
+        // Dalji sadržaj
+        let y = yLine + lineSpacing;
+
+        doc.setFontSize(12);
+        const addField = (label: string, value: string) => {
+            doc.setFont("helvetica", "bold");
+            doc.text(`${label}:`, marginLeft, y);
+            doc.setFont("helvetica", "normal");
+            doc.text(value, marginLeft + 40, y);
+            y += lineSpacing;
+        };
+
+        addField("Incident ID", String(incident.id));
+        addField("Type", incident.incidentType);
+        addField("Reported By", incident.reportedBy);
+        addField("Status", incident.status);
+        addField("Severity", incident.severity);
+        addField("Location", incident.location);
+        addField("Date", new Date(incident.date).toLocaleString());
+        addField("Last Updated", new Date(incident.lastUpdated).toLocaleString());
+
+        y += lineSpacing;
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Description:", marginLeft, y);
+        y += lineSpacing;
+        doc.setFont("helvetica", "normal");
+        const descriptionLines = doc.splitTextToSize(incident.description, 170);
+        doc.text(descriptionLines, marginLeft, y);
+        y += descriptionLines.length * lineSpacing;
+
+        if (notes.trim() !== "") {
+            y += lineSpacing;
+            doc.setFont("helvetica", "bold");
+            doc.text("Admin Notes:", marginLeft, y);
+            y += lineSpacing;
+            doc.setFont("helvetica", "normal");
+            const notesLines = doc.splitTextToSize(notes.trim(), 170);
+            doc.text(notesLines, marginLeft, y);
+        }
+
+        doc.save(`Incident_Report_${incident.id}.pdf`);
+    };
+
     const theme = useTheme();
     //const [status, setStatus] = useState<IncidentStatus>(incident.status);
     const [notes, setNotes] = useState('');
@@ -317,11 +422,8 @@ const IncidentDetails: React.FC= () => {
                         </Typography>
                         <Divider sx={{ my: 2 }} />
 
-                        <Button variant="outlined" fullWidth sx={{ mb: 2 }}>
+                        <Button variant="outlined" fullWidth sx={{ mb: 2 }} onClick={handlePrintReport}>
                             Print Report
-                        </Button>
-                        <Button variant="outlined" color="error" fullWidth>
-                            Archive Incident
                         </Button>
                     </CardContent>
                 </Card>
