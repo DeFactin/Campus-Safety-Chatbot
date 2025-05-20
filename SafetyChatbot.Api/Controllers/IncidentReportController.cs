@@ -80,6 +80,37 @@ namespace SafetyChatbot.Api.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpPatch("{id}")]
+        public ActionResult<IncidentReportDto> Patch(int id, [FromBody] PatchIncidentDto dto)
+        {
+            if (dto == null)
+                return BadRequest();
+
+            var existing = _incidentReportRepository.GetSingle(id);
+            if (existing == null)
+                return NotFound();
+
+            // Patch only fields that are non-null
+            if (dto.ReportedBy != null) existing.ReportedBy = dto.ReportedBy;
+            if (dto.IncidentType != null) existing.IncidentType = dto.IncidentType;
+            if (dto.Status != null) existing.Status = dto.Status;
+            if (dto.Description != null) existing.Description = dto.Description;
+            if (dto.Date != null) existing.Date = dto.Date.Value;
+            if (dto.Location != null) existing.Location = dto.Location;
+            if (dto.Severity != null) existing.Severity = dto.Severity;
+            if (dto.AdminNotes != null) existing.AdminNotes = dto.AdminNotes;
+
+            existing.LastUpdated = DateTime.UtcNow;
+
+            _incidentReportRepository.Update(id, existing);
+
+            var resultDto = _mapper.Map<IncidentReportDto>(existing);
+            return Ok(resultDto);
+        }
+
+
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
