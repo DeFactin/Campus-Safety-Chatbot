@@ -30,13 +30,11 @@ import {
 } from 'lucide-react';
 import { Incident, IncidentStatus, SeverityLevel } from '../../types/incident';
 
-interface IncidentDetailsProps {
-    incident: Incident;
-}
 
 const IncidentDetails: React.FC= () => {
     const theme = useTheme();
     //const [status, setStatus] = useState<IncidentStatus>(incident.status);
+
     const [notes, setNotes] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -52,6 +50,8 @@ const IncidentDetails: React.FC= () => {
                 const data: Incident = await response.json();
                 setIncident(data);
                 setStatus(data.status);
+                setNotes(data.adminNotes || ''); // Set initial notes
+
             } catch (error) {
                 console.error("Failed to fetch incident:", error);
             }
@@ -68,6 +68,31 @@ const IncidentDetails: React.FC= () => {
     const handleNotesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNotes(event.target.value);
     };
+
+    const handleSaveNotes = async () => {
+        if (!incident || notes.trim() === '') return;
+
+        try {
+            const response = await fetch(`/api/incidentreports/${incident.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ adminNotes: notes })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update notes');
+            }
+
+            const updatedIncident: Incident = await response.json();
+            setIncident(updatedIncident); // Keep UI in sync
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error('Error saving notes:', error);
+        }
+    };
+
 
     const handleUpdateIncident = async () => {
         if (!incident) return;
@@ -247,7 +272,7 @@ const IncidentDetails: React.FC= () => {
                             variant="contained"
                             color="primary"
                             disabled={notes.trim() === ''}
-                            onClick={handleUpdateIncident}
+                            onClick={handleSaveNotes}
                             startIcon={<Check size={18} />}
                         >
                             Save Notes

@@ -13,5 +13,6 @@ export interface Incident {
     description: string;
     reportedAt?: string;
     lastUpdated?: string;
+    adminNotes?: string;
     
 }
