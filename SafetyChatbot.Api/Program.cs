@@ -41,9 +41,10 @@ builder.Services.AddCors(options =>
 
 // Register DialogflowService
 var projectId = "campussafetychatbot-pom9";
+var knowledgeBaseId = "MTcyMjMyMDM5NjA5MDc2Mjg1NDU";
 
 builder.Services.AddSingleton<IDialogflowService>(provider =>
-    new DialogflowService(projectId));
+    new DialogflowService(projectId, knowledgeBaseId));
 
 var app = builder.Build();
 
