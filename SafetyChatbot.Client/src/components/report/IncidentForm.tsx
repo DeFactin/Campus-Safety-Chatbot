@@ -35,16 +35,12 @@ const incidentTypes = [
 ];
 
 const locations = [
-    'Library Building',
-    'Faculty of Engineering',
-    'Faculty of Arts',
-    'Student Center',
-    'Dormitory A',
-    'Dormitory B',
+    'Building A',
+    'Building B',
+    'RDC',
     'Sports Hall',
-    'Parking Lot A',
-    'Parking Lot B',
-    'Campus Entry Gate',
+    'Parking Lot',
+    'Campus Grounds',
     'Other'
 ];
 
@@ -73,14 +69,20 @@ const IncidentForm: React.FC = () => {
         severity: '',         
     });
 
+    
 
     const [errors, setErrors] = useState({
-        type: false,
+        incidentType: false,
         location: false,
         date: false,
         description: false,
-        severityLevel: false
+        severity: false,
     });
+
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
         
@@ -98,14 +100,13 @@ const IncidentForm: React.FC = () => {
         });
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setFormData({
-                ...formData,
-                evidenceFile: e.target.files[0].name
-            });
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setSelectedFile(event.target.files[0]);
         }
     };
+
+
 
     const validateStep = () => {
         let isValid = true;
@@ -156,31 +157,32 @@ const IncidentForm: React.FC = () => {
 
     const handleSubmit = async () => {
         try {
+            const submissionData = new FormData();
+        
+            submissionData.append("jsonData", JSON.stringify(formData));
             console.log(JSON.stringify(formData));
-            console.log(token);
-            console.log("nesto1");
 
+            if (selectedFile) {
+                submissionData.append("file", selectedFile);
+            }
+            console.log(JSON.stringify(submissionData));
             const response = await fetch('/api/incidentreports', {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
+                body: submissionData, // Do not set Content-Type here
             });
 
-            console.log("nesto2");
             if (response.ok) {
                 const result = await response.json();
                 console.log("Submitted successfully:", result);
+                setSubmitted(true);
             } else {
                 console.error("Failed to submit:", response.statusText);
             }
         } catch (error) {
             console.error("Error during submission:", error);
         }
-
-        setSubmitted(true);
     };
+
 
 
     const getSeverityColor = (severity: SeverityLevel) => {
@@ -273,7 +275,7 @@ const IncidentForm: React.FC = () => {
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 3 }}>
-                            <FormControl fullWidth error={errors.type} sx={{ flex: 1 }}>
+                            <FormControl fullWidth error={errors.incidentType} sx={{ flex: 1 }}>
                                 <InputLabel id="incident-type-label">Incident Type *</InputLabel>
                                 <Select
                                     labelId="incident-type-label"
@@ -287,7 +289,7 @@ const IncidentForm: React.FC = () => {
                                         <MenuItem key={type} value={type}>{type}</MenuItem>
                                     ))}
                                 </Select>
-                                {errors.type && (
+                                {errors.incidentType && (
                                     <FormHelperText>Incident type is required</FormHelperText>
                                 )}
                             </FormControl>
@@ -379,7 +381,7 @@ const IncidentForm: React.FC = () => {
                                     <MenuItem value="medium">Medium</MenuItem>
                                     <MenuItem value="low">Low</MenuItem>
                                 </Select>
-                                {errors.severityLevel && (
+                                {errors.severity && (
                                     <FormHelperText>Severity level is required</FormHelperText>
                                 )}
                             </FormControl>
@@ -402,9 +404,9 @@ const IncidentForm: React.FC = () => {
                                     onChange={handleFileChange}
                                 />
                             </Button>
-                            {formData.evidenceFile && (
+                            {selectedFile && (
                                 <Typography variant="body2" sx={{ mt: 1 }}>
-                                    Selected file: {formData.evidenceFile}
+                                    Selected file: {selectedFile.name}
                                 </Typography>
                             )}
                         </Box>
@@ -431,7 +433,7 @@ const IncidentForm: React.FC = () => {
                                     Incident Type
                                 </Typography>
                                 <Typography variant="body1" fontWeight={500} paragraph>
-                                    {formData.type}
+                                    {formData.incidentType}
                                 </Typography>
                             </Box>
                             <Box sx={{ flex: 1 }}>
@@ -479,16 +481,17 @@ const IncidentForm: React.FC = () => {
                             </Typography>
                         </Box>
 
-                        {formData.evidenceFile && (
+                        {selectedFile && (
                             <Box>
                                 <Typography variant="subtitle2" color="text.secondary">
                                     Evidence Attached
                                 </Typography>
                                 <Typography variant="body1" paragraph>
-                                    {formData.evidenceFile}
+                                    {selectedFile.name}
                                 </Typography>
                             </Box>
                         )}
+
                     </Box>
                 )}
 

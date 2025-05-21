@@ -2,7 +2,6 @@
 
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
 using SafetyChatbot.Application;
 using SafetyChatbot.Application.Dtos;
 using SafetyChatbot.Domain.Models;
@@ -10,6 +9,7 @@ using SafetyChatbot.Infrastructure;
 using SafetyChatbot.Infrastructure.Repositories;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SafetyChatbot.Api.Controllers
 {
@@ -53,13 +53,69 @@ namespace SafetyChatbot.Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult<IncidentReportDto> Submit([FromBody] SubmitIncidentReportDto dto)
+        [RequestSizeLimit(10_000_000)] // Optional: limit upload size to 10MB
+        public async Task<ActionResult<IncidentReportDto>> Submit(
+            [FromForm] string jsonData,
+            [FromForm] IFormFile file)
         {
-            var report = _mapper.Map<IncidentReport>(dto);
-            _incidentReportRepository.Add(report);
+            try
+            {
 
-            var resultDto = _mapper.Map<IncidentReportDto>(report);
-            return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
+                // 1. Deserialize the JSON string into your DTO
+                var dto = JsonSerializer.Deserialize<SubmitIncidentReportDto>(
+                    jsonData,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+              
+                if (dto == null)
+                {
+                    Console.WriteLine("Deserialization failed.");
+                    return BadRequest("Invalid data format.");
+                }
+
+                // 2. Save the file (optional, if file is provided)
+                string? savedFilePath = null;
+                if (file != null && file.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+                    Directory.CreateDirectory(uploadsFolder); // Make sure the folder exists
+
+                    var uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+                    savedFilePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(savedFilePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                }
+
+                // 3. Map to domain model
+                var report = _mapper.Map<IncidentReport>(dto);
+           
+                // Store the file path in the entity
+                if (!string.IsNullOrEmpty(savedFilePath))
+                {
+                    report.FilePath = savedFilePath;
+                }
+
+                // 4. Save to the repository
+                _incidentReportRepository.Add(report);
+
+                // 5. Return response
+                var resultDto = _mapper.Map<IncidentReportDto>(report);
+                return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
+
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                // Return an error response
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "An error occurred while processing your request." });
+            }
+
         }
 
         [Authorize(Roles = "Admin")]
