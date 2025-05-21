@@ -36,6 +36,9 @@ namespace SafetyBotAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FilePath")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("IncidentType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

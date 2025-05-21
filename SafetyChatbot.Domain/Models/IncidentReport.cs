@@ -36,6 +36,8 @@ namespace SafetyChatbot.Domain.Models
         [Required]
         public string Severity { get; set; }
 
+        public string? FilePath { get; set; }
+
         public DateTime LastUpdated { get; set; }
 
 

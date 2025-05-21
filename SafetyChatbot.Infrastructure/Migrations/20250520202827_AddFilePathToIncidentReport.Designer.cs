@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SafetyBotAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250515080640_newMigration")]
-    partial class newMigration
+    [Migration("20250520202827_AddFilePathToIncidentReport")]
+    partial class AddFilePathToIncidentReport
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,6 +37,9 @@ namespace SafetyBotAPI.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IncidentType")
