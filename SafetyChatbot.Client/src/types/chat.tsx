@@ -9,3 +9,10 @@ export interface ChatResponse {
     text: string;
     suggestions?: string[];
 }
+export interface ChatHistory {
+    id: string;
+    title: string;
+    lastMessage: string;
+    timestamp: Date;
+    messages: Message[];
+}

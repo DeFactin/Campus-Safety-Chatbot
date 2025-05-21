@@ -12,4 +12,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<SafetyRegulation> SafetyRegulations { get; set; }
 
     public DbSet<IncidentReport> IncidentReports { get; set; } 
+    public DbSet<ChatSession> ChatSessions { get; set; }
+    public DbSet<ChatMessage> ChatMessages { get; set; }
 }
