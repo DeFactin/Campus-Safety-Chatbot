@@ -14,11 +14,14 @@ import {
 import { Send, Bot, Shield, AlertCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { Message } from '../../types/chat';
+import { ChatHistory } from '../../types/chat';
 import { sendChatMessage } from '../../services/ApiService';
 import ChatMessage from './ChatMessage';
 import ChatSuggestions from './ChatSuggestions';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
+import ChatHistorySidebar from './ChatHistorySidebar';
+
 
 interface DecodedToken {
     name: string;
@@ -116,9 +119,43 @@ const ChatInterface: React.FC = () => {
     const handleSuggestionClick = (suggestion: string) => {
         setInput(suggestion);
     };
+    // Add these to your existing state declarations
+    const [selectedChat, setSelectedChat] = useState<string | null>(null);
+    const [chatHistory, setChatHistory] = useState<ChatHistory[]>([
+        {
+            id: '1',
+            title: 'Emergency Procedures',
+            lastMessage: 'Thank you for the information about emergency exits.',
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+            messages: []
+        },
+    ]); // You'll need to import ChatHistory type
+
+// Add this handler function
+    const handleChatSelect = (chatId: string) => {
+        setSelectedChat(chatId);
+        // Here you would typically load the messages for the selected chat
+        // For now, we'll just show a placeholder message
+        setMessages([
+            {
+                id: uuidv4(),
+                text: "Previous chat loaded. How can I help you further?",
+                sender: 'bot',
+                timestamp: new Date()
+            }
+        ]);
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, width: '100%' }}>
+            {/* Chat History Sidebar */}
+            <Box sx={{ flex: 1, display: { xs: 'none', md: 'block' } }}>
+                <ChatHistorySidebar
+                    chatHistory={chatHistory}
+                    selectedChat={selectedChat}
+                    onChatSelect={handleChatSelect}
+                />
+            </Box>
             {/* Main Chat Area */}
             <Box sx={{ flex: 2, minWidth: 0 }}>
                 <Paper elevation={0} sx={{ height: '70vh', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
