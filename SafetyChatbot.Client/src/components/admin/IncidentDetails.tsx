@@ -63,11 +63,9 @@ const IncidentDetails: React.FC = () => {
         const topMargin = 20;
         const lineSpacing = 8;
 
-        // Font i velièina
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
 
-        // Pripremi logo
         let logoHeight = 0;
         try {
             const logo = new Image();
@@ -77,26 +75,25 @@ const IncidentDetails: React.FC = () => {
                 logo.onerror = rej;
             });
 
-            const targetHeight = 20; // visina da odgovara tekstu
+            const targetHeight = 20; 
             const aspectRatio = logo.width / logo.height;
             const logoWidth = targetHeight * aspectRatio;
             logoHeight = targetHeight;
 
-            const xLogo = 190 - logoWidth; // desno poravnato
+            const xLogo = 190 - logoWidth; 
             doc.addImage(logo, "PNG", xLogo, topMargin, logoWidth, logoHeight);
         } catch (error) {
             console.error("Logo nije uèitan:", error);
         }
 
-        // Naslov u liniji s logom
         doc.text("Incident Report", marginLeft, topMargin + logoHeight * 0.8);
 
-        // Linija ispod
+       
         const yLine = topMargin + logoHeight + 4;
         doc.setLineWidth(0.5);
         doc.line(marginLeft, yLine, 190, yLine);
 
-        // Dalji sadržaj
+       
         let y = yLine + lineSpacing;
 
         doc.setFontSize(12);
@@ -235,9 +232,7 @@ const IncidentDetails: React.FC = () => {
             console.error('Error updating incident:', error);
         }
 
-        useEffect(() => {
-            window.scrollTo(0, 0);
-        }, []);
+      
     };
 
 
