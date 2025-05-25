@@ -3,7 +3,7 @@ import {
     Box,
     Container,
     Typography,
-    Link,
+    Link as MuiLink,
     Divider,
     IconButton
 } from '@mui/material';
@@ -14,6 +14,7 @@ import {
     MapPin,
     Phone
 } from 'lucide-react';
+import { Link } from 'react-router-dom'; // Import from react-router-dom
 
 const Footer: React.FC = () => {
     return (
@@ -36,7 +37,7 @@ const Footer: React.FC = () => {
                         justifyContent: 'space-between'
                     }}
                 >
-                    {/* Column 1 */}
+                    {/* Column 1 - unchanged */}
                     <Box
                         sx={{
                             flex: {
@@ -69,7 +70,7 @@ const Footer: React.FC = () => {
                         </Box>
                     </Box>
 
-                    {/* Column 2 */}
+                    {/* Column 2 - Quick Links with proper navigation */}
                     <Box
                         sx={{
                             flex: {
@@ -82,20 +83,47 @@ const Footer: React.FC = () => {
                         <Typography variant="h6" fontWeight="bold" mb="16px">
                             Quick Links
                         </Typography>
-                        {['Home', 'Report Incident', 'Admin Dashboard', 'Safety Regulations'].map((text) => (
-                            <Link
-                                key={text}
-                                href="#"
-                                underline="hover"
-                                color="inherit"
-                                sx={{ display: 'block', mb: 1.5 }}
-                            >
-                                {text}
-                            </Link>
-                        ))}
+                        {/* Internal routes using react-router */}
+                        <MuiLink
+                            component={Link}
+                            to="/"
+                            underline="hover"
+                            color="inherit"
+                            sx={{ display: 'block', mb: 1.5 }}
+                        >
+                            Home
+                        </MuiLink>
+                        <MuiLink
+                            component={Link}
+                            to="/chat"
+                            underline="hover"
+                            color="inherit"
+                            sx={{ display: 'block', mb: 1.5 }}
+                        >
+                            Chat Now
+                        </MuiLink>
+                        <MuiLink
+                            component={Link}
+                            to="/report"
+                            underline="hover"
+                            color="inherit"
+                            sx={{ display: 'block', mb: 1.5 }}
+                        >
+                            Report Incident
+                        </MuiLink>                      
+                        <MuiLink
+                            component={Link}
+                            to="/admin"
+                            underline="hover"
+                            color="inherit"
+                            sx={{ display: 'block', mb: 1.5 }}
+                        >
+                            Admin Dashboard
+                        </MuiLink>
+                        
                     </Box>
 
-                    {/* Column 3 */}
+                    {/* Column 3 - University Policies */}
                     <Box
                         sx={{
                             flex: {
@@ -108,20 +136,39 @@ const Footer: React.FC = () => {
                         <Typography variant="h6" fontWeight="bold" mb="16px">
                             University Policies
                         </Typography>
-                        {[ 'Emergency Contacts', 'Privacy Policy', 'Terms of Service'].map((text) => (
-                            <Link
-                                key={text}
-                                href="#"
-                                underline="hover"
-                                color="inherit"
-                                sx={{ display: 'block', mb: 1.5 }}
-                            >
-                                {text}
-                            </Link>
-                        ))}
+                        {/* Example with mixed internal and external links */}
+                        <MuiLink
+                            component={Link}
+                            to="/chat"
+                            underline="hover"
+                            color="inherit"
+                            sx={{ display: 'block', mb: 1.5 }}
+                        >
+                            Emergency Contacts
+                        </MuiLink>
+                        <MuiLink
+                            href="/privacy-policy.pdf" // External file
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            underline="hover"
+                            color="inherit"
+                            sx={{ display: 'block', mb: 1.5 }}
+                        >
+                            Privacy Policy
+                        </MuiLink>
+                        <MuiLink
+                            href="https://ius.edu.ba/terms" // External URL
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            underline="hover"
+                            color="inherit"
+                            sx={{ display: 'block', mb: 1.5 }}
+                        >
+                            Terms of Service
+                        </MuiLink>
                     </Box>
 
-                    {/* Column 4 */}
+                    {/* Column 4 - unchanged */}
                     <Box
                         sx={{
                             flex: {
@@ -171,11 +218,30 @@ const Footer: React.FC = () => {
                         &#169; 2025 International University of Sarajevo. All rights reserved.
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                        {['Terms', 'Privacy', 'Cookies'].map((label) => (
-                            <Link key={label} href="#" color="inherit" underline="hover">
-                                <Typography variant="body2">{label}</Typography>
-                            </Link>
-                        ))}
+                        <MuiLink
+                            component={Link}
+                            to="/terms"
+                            color="inherit"
+                            underline="hover"
+                        >
+                            <Typography variant="body2">Terms</Typography>
+                        </MuiLink>
+                        <MuiLink
+                            component={Link}
+                            to="/privacy"
+                            color="inherit"
+                            underline="hover"
+                        >
+                            <Typography variant="body2">Privacy</Typography>
+                        </MuiLink>
+                        <MuiLink
+                            component={Link}
+                            to="/cookies"
+                            color="inherit"
+                            underline="hover"
+                        >
+                            <Typography variant="body2">Cookies</Typography>
+                        </MuiLink>
                     </Box>
                 </Box>
             </Container>
