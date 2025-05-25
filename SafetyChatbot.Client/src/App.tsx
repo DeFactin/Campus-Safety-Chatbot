@@ -34,16 +34,15 @@ function App() {
                         </ProtectedRoute>
                     } />
                     <Route path="/chat" element={
-                    <ProtectedRoute requiredRole="User">
-                        <ChatPage />
-                    </ProtectedRoute>} />
+                        <ProtectedRoute requiredRole="User">
+                            <ChatPage />
+                        </ProtectedRoute>} />
 
                     <Route path="/admin/:id" element={<IncidentDetailsPage />} />
-                    
+
                 </Routes>
             </Router>
         </ThemeProvider>
-    );
+    )
 }
-
 export default App;

@@ -52,6 +52,7 @@ const ChatInterface: React.FC = () => {
             }
         }
     }, []);
+
     const [messages, setMessages] = useState<Message[]>([
         {
             id: uuidv4(),
@@ -64,13 +65,16 @@ const ChatInterface: React.FC = () => {
     const sessionId = useRef<string>(uuidv4());
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+    // 1. Add a ref for the messages container
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+    // 2. Update the useEffect to scroll the container
     useEffect(() => {
-        scrollToBottom();
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     }, [messages]);
+    
 
     const handleSend = async () => {
         if (!input.trim()) return;
@@ -146,6 +150,8 @@ const ChatInterface: React.FC = () => {
         ]);
     };
 
+
+
     return (
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, width: '100%' }}>
             {/* Chat History Sidebar */}
@@ -159,13 +165,13 @@ const ChatInterface: React.FC = () => {
             {/* Main Chat Area */}
             <Box sx={{ flex: 2, minWidth: 0 }}>
                 <Paper elevation={0} sx={{ height: '70vh', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
-                    <Box sx={{ flex: 1, overflowY: 'auto', p: 3, bgcolor: 'background.default' }}>
+                    <Box ref={messagesContainerRef} sx={{ flex: 1, overflowY: 'auto', p: 3, scrollBehavior: 'smooth',bgcolor: 'background.default' }}>
                         {messages.map((message) => (
                             <ChatMessage key={message.id} message={message} username={username}/>
                         ))}
                         <div ref={messagesEndRef} />
                     </Box>
-
+                    
                     <Divider />
 
                     <Box sx={{ p: 2, bgcolor: 'background.paper' }}>
@@ -226,8 +232,20 @@ const ChatInterface: React.FC = () => {
                             </Typography>
                         </Box>
                         <Box sx={{ mb: 2 }}>
-                            <Typography variant="subtitle2" color="text.secondary">Campus Security</Typography>
-                            <Typography variant="body1" fontWeight={500}>+387 33 957 101</Typography>
+                            <Typography variant="subtitle2" color="text.secondary">Security Office</Typography>
+                            <Typography variant="body1" fontWeight={500}>+387 33 957 104</Typography>
+                        </Box>
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="subtitle2" color="text.secondary">Maintenance Manager</Typography>
+                            <Typography variant="body1" fontWeight={500}>+387 33 957 170</Typography>
+                        </Box>
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="subtitle2" color="text.secondary">IUS Security Personnel</Typography>
+                            <Typography variant="body1" fontWeight={500}>+387 33 957 104</Typography>
+                        </Box>
+                        <Box sx={{ mb: 2 }}>
+                            <Typography variant="subtitle2" color="text.secondary">Students Affairs Ofiice</Typography>
+                            <Typography variant="body1" fontWeight={500}>+387 33 957 175</Typography>
                         </Box>
                         <Box>
                             <Typography variant="subtitle2" color="text.secondary">Emergency Services</Typography>
