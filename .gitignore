@@ -5,6 +5,7 @@
 
 # dotenv files
 .env
+.serviceAccountKey.json
 
 # User-specific files
 *.rsuser
