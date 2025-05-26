@@ -504,3 +504,4 @@ safetychatbot.client/coverage/
 # Vite specific
 safetychatbot.client/.vite/
 safetychatbot.client/*.local
+SafetyChatbot.Api/serviceAccountKey.json
