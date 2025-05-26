@@ -14,6 +14,7 @@ using System.Security.Authentication;
 
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment.EnvironmentName;
 
 // Get the connection string directly
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
