@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-using AutoMapper;
+﻿using AutoMapper;
+using FirebaseAdmin.Messaging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SafetyChatbot.Application;
 using SafetyChatbot.Application.Dtos;
+using SafetyChatbot.Application.Services;
 using SafetyChatbot.Domain.Models;
 using SafetyChatbot.Infrastructure;
 using SafetyChatbot.Infrastructure.Repositories;
 using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
 
 namespace SafetyChatbot.Api.Controllers
 {
@@ -22,13 +24,17 @@ namespace SafetyChatbot.Api.Controllers
     {
         private readonly IIncidentReportRepository _incidentReportRepository;
         private readonly IMapper _mapper;
+        private readonly ApplicationDbContext _context;
+
 
         public IncidentReportController(
             IIncidentReportRepository IncidentReportRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ApplicationDbContext context )
         {
             _incidentReportRepository = IncidentReportRepository;
             _mapper = mapper;
+            _context = context;
         }
         [Authorize(Roles = "Admin")]
         [HttpGet]
@@ -74,14 +80,14 @@ namespace SafetyChatbot.Api.Controllers
 
             _mapper.Map(dto, existing);
             _incidentReportRepository.Update(id, existing);
-
+           
             var resultDto = _mapper.Map<IncidentReportDto>(existing);
             return Ok(resultDto);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPatch("{id}")]
-        public ActionResult<IncidentReportDto> Patch(int id, [FromBody] PatchIncidentDto dto)
+        public async Task<ActionResult<IncidentReportDto>> Patch(int id, [FromBody] PatchIncidentDto dto)
         {
             if (dto == null)
                 return BadRequest();
@@ -89,6 +95,8 @@ namespace SafetyChatbot.Api.Controllers
             var existing = _incidentReportRepository.GetSingle(id);
             if (existing == null)
                 return NotFound();
+
+            var oldStatus = existing.Status;
 
             // Patch only fields that are non-null
             if (dto.ReportedBy != null) existing.ReportedBy = dto.ReportedBy;
@@ -104,17 +112,61 @@ namespace SafetyChatbot.Api.Controllers
 
             _incidentReportRepository.Update(id, existing);
 
+            if (oldStatus != existing.Status)
+            {
+                var tokens = await _context.PushTokens
+                    .Where(t => t.UserId == existing.ReportedBy)
+                    .Select(t => t.Token)
+                    .ToListAsync();
+
+                var notification = new NotificationRecord
+                {
+                    UserId = existing.ReportedBy,
+                    Title = $"Status of incident changed to {existing.Status}",
+                    Message = $"{existing.AdminNotes}",
+                    ReceivedAt = DateTime.UtcNow,
+                    IsRead = false
+                };
+
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
+                foreach (var token in tokens)
+                {
+                    var message = new Message()
+                    {
+
+                        Token = token,
+                        Data = new Dictionary<string, string>()
+            {
+                { "title", notification.Title },
+                { "body", notification.Message }
+            }
+                    };
+
+                    try
+                    {
+                        string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                        Console.WriteLine($"Successfully sent message: {response}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to send message to token {token}: {ex.Message}");
+                    }
+                }
+            }
+
             var resultDto = _mapper.Map<IncidentReportDto>(existing);
             return Ok(resultDto);
         }
 
-
-
-        [Authorize(Roles = "Admin")]
+    
+    
+    [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-         
+
             _incidentReportRepository.Delete(id);
             return NoContent();
         }
