@@ -45,6 +45,7 @@ var knowledgeBaseId = "MTcyMjMyMDM5NjA5MDc2Mjg1NDU";
 
 builder.Services.AddSingleton<IDialogflowService>(provider =>
     new DialogflowService(projectId, knowledgeBaseId));
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
 var app = builder.Build();
 
