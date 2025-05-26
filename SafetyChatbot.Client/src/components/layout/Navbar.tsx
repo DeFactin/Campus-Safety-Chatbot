@@ -71,7 +71,6 @@ const Navbar: React.FC = () => {
 
     const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
     const handleLogout = () => {
-        Cookies.remove('token');
         navigate('/');
         window.location.reload();
     };
@@ -145,6 +144,7 @@ const Navbar: React.FC = () => {
                             fullWidth
                             variant="outlined"
                             color="error"
+                            href="https://localhost:7084/signout"
                             startIcon={<LogOut size={18} />}
                             onClick={handleLogout}
                             sx={{ mt: 2 }}
@@ -261,6 +261,7 @@ const Navbar: React.FC = () => {
                                             />
                                         <IconButton
                                             color="error"
+                                            href="https://localhost:7084/signout"
                                             onClick={handleLogout}
                                             sx={{
                                                 ml: 1,
