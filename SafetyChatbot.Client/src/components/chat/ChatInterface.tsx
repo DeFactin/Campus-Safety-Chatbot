@@ -13,15 +13,13 @@ import {
 } from '@mui/material';
 import { Send, Bot, Shield, AlertCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
-import { Message } from '../../types/chat';
-import { ChatHistory } from '../../types/chat';
-import { sendChatMessage } from '../../services/ApiService';
+import { Message, ChatHistory } from '../../types/chat';
+import { sendChatMessage, fetchChatHistory, fetchChatSessions } from '../../services/ApiService';
 import ChatMessage from './ChatMessage';
 import ChatSuggestions from './ChatSuggestions';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import ChatHistorySidebar from './ChatHistorySidebar';
-
 
 interface DecodedToken {
     name: string;
@@ -40,6 +38,7 @@ const initialSuggestions = [
 const ChatInterface: React.FC = () => {
     const theme = useTheme();
     const [username, setUsername] = useState<string | null>(null);
+
     useEffect(() => {
         const storedToken = Cookies.get('token');
         if (storedToken) {
@@ -52,6 +51,7 @@ const ChatInterface: React.FC = () => {
             }
         }
     }, []);
+
     const [messages, setMessages] = useState<Message[]>([
         {
             id: uuidv4(),
@@ -72,18 +72,34 @@ const ChatInterface: React.FC = () => {
         scrollToBottom();
     }, [messages]);
 
+    const [selectedChat, setSelectedChat] = useState<string | null>(null);
+    const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
+
+    // Load chat sessions for sidebar when component mounts
+    useEffect(() => {
+        const loadChatSessions = async () => {
+            try {
+                const sessions = await fetchChatSessions();
+                setChatHistory(sessions);
+            } catch (error) {
+                console.error("Failed to load chat sessions:", error);
+            }
+        };
+        loadChatSessions();
+    }, []);
+
     const handleSend = async () => {
         if (!input.trim()) return;
 
         const userMessage: Message = {
             id: uuidv4(),
-            text: input,
+            text: input.trim(),
             sender: 'user',
             timestamp: new Date()
         };
 
         setMessages(prev => [...prev, userMessage]);
-        const currentInput = input;
+        const currentInput = input.trim();
         setInput('');
 
         try {
@@ -97,17 +113,15 @@ const ChatInterface: React.FC = () => {
             };
 
             setMessages(prev => [...prev, botMessage]);
-        } catch (error) {
-            const errorMessage: Message = {
-                id: uuidv4(),
-                text: "Sorry, I couldn't reach the server. Please try again later.",
-                sender: 'bot',
-                timestamp: new Date()
-            };
 
-            setMessages(prev => [...prev, errorMessage]);
+            // Refresh sidebar to show latest session updates
+            const sessions = await fetchChatSessions();
+            setChatHistory(sessions);
+        } catch (error) {
+            console.error('Failed to send message:', error);
         }
     };
+
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -119,27 +133,33 @@ const ChatInterface: React.FC = () => {
     const handleSuggestionClick = (suggestion: string) => {
         setInput(suggestion);
     };
-    // Add these to your existing state declarations
-    const [selectedChat, setSelectedChat] = useState<string | null>(null);
-    const [chatHistory, setChatHistory] = useState<ChatHistory[]>([
-        {
-            id: '1',
-            title: 'Emergency Procedures',
-            lastMessage: 'Thank you for the information about emergency exits.',
-            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-            messages: []
-        },
-    ]); // You'll need to import ChatHistory type
 
-// Add this handler function
-    const handleChatSelect = (chatId: string) => {
-        setSelectedChat(chatId);
-        // Here you would typically load the messages for the selected chat
-        // For now, we'll just show a placeholder message
+    // Corrected handleChatSelect to properly load session messages and debug
+    const handleChatSelect = async (chatId: string) => {
+        try {
+            const history = await fetchChatHistory(chatId);
+            const formattedMessages = history.map((m: any) => ({
+                id: uuidv4(),
+                text: m.message,
+                sender: m.sender,
+                timestamp: new Date(m.timestamp)
+            }));
+            setMessages(formattedMessages);
+            sessionId.current = chatId;
+            setSelectedChat(chatId);
+        } catch (error) {
+            console.error("Failed to load chat history", error);
+        }
+    };
+
+
+    const handleNewChat = () => {
+        sessionId.current = uuidv4();
+        setSelectedChat(null);
         setMessages([
             {
                 id: uuidv4(),
-                text: "Previous chat loaded. How can I help you further?",
+                text: "Hello! I'm your IUS Campus Safety Assistant. How can I help you today?",
                 sender: 'bot',
                 timestamp: new Date()
             }
@@ -154,14 +174,22 @@ const ChatInterface: React.FC = () => {
                     chatHistory={chatHistory}
                     selectedChat={selectedChat}
                     onChatSelect={handleChatSelect}
+                    onNewChat={handleNewChat}
                 />
             </Box>
             {/* Main Chat Area */}
             <Box sx={{ flex: 2, minWidth: 0 }}>
-                <Paper elevation={0} sx={{ height: '70vh', display: 'flex', flexDirection: 'column', borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+                <Paper elevation={0} sx={{
+                    height: '70vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    borderRadius: 2,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                    overflow: 'hidden'
+                }}>
                     <Box sx={{ flex: 1, overflowY: 'auto', p: 3, bgcolor: 'background.default' }}>
                         {messages.map((message) => (
-                            <ChatMessage key={message.id} message={message} username={username}/>
+                            <ChatMessage key={message.id} message={message} username={username} />
                         ))}
                         <div ref={messagesEndRef} />
                     </Box>
@@ -203,8 +231,16 @@ const ChatInterface: React.FC = () => {
                 </Paper>
             </Box>
 
-            {/* Sidebar */}
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3, position: { md: 'sticky' }, top: 24, alignSelf: 'flex-start' }}>
+            {/* Sidebar with Quick Actions and Emergency Contacts */}
+            <Box sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+                position: { md: 'sticky' },
+                top: 24,
+                alignSelf: 'flex-start'
+            }}>
                 <Card elevation={0} sx={{ borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
                     <CardContent>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -248,3 +284,4 @@ const ChatInterface: React.FC = () => {
 };
 
 export default ChatInterface;
+
