@@ -505,3 +505,5 @@ safetychatbot.client/coverage/
 safetychatbot.client/.vite/
 safetychatbot.client/*.local
 SafetyChatbot.Api/serviceAccountKey.json
+SafetyChatbot.Api/appsettings.Development.json
+SafetyChatbot.Api/appsettings.json
