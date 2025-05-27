@@ -23,47 +23,45 @@ namespace SafetyBotAPI.Migrations
 
             modelBuilder.Entity("SafetyChatbot.Domain.Models.ChatMessage", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<string>("Content")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChatSessionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsFromUser")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Sender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SessionId");
+                    b.HasIndex("ChatSessionId");
 
                     b.ToTable("ChatMessages");
                 });
 
             modelBuilder.Entity("SafetyChatbot.Domain.Models.ChatSession", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserIdentifier")
+                    b.Property<string>("SessionId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -150,13 +148,13 @@ namespace SafetyBotAPI.Migrations
 
             modelBuilder.Entity("SafetyChatbot.Domain.Models.ChatMessage", b =>
                 {
-                    b.HasOne("SafetyChatbot.Domain.Models.ChatSession", "Session")
+                    b.HasOne("SafetyChatbot.Domain.Models.ChatSession", "ChatSession")
                         .WithMany("Messages")
-                        .HasForeignKey("SessionId")
+                        .HasForeignKey("ChatSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Session");
+                    b.Navigation("ChatSession");
                 });
 
             modelBuilder.Entity("SafetyChatbot.Domain.Models.ChatSession", b =>
