@@ -1,27 +1,24 @@
 ﻿import React, { useEffect, useState } from 'react';
 import {
-    AppBar,
-    Box,
-    Toolbar,
-    Typography,
-    Button,
-    IconButton,
-    Drawer,
-    List,
-    ListItem,
-    ListItemText,
-    Container,
-    useMediaQuery,
-    useTheme,
-    Avatar,
-    Chip,
-    Divider
+    AppBar, Box, Toolbar, Typography, Button, IconButton, Drawer,
+    List, ListItem, ListItemText, Container, useMediaQuery, useTheme,
+    Avatar, Chip, Divider, Menu, MenuItem
 } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut } from 'lucide-react';
+import {X, LogOut } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
-
+import {
+    requestFirebaseToken
+} from "../../services/firebase";
+import {
+    getNotifications,
+    getUnreadNotifications,
+    markAllNotificationsAsRead
+} from "../../services/ApiService";
+import NotificationBell from './NotificationBell';
+import { messaging } from '../../services/firebase';
+import { onMessage } from 'firebase/messaging';
 type DecodedToken = {
     name: string;
     email: string;
@@ -38,6 +35,50 @@ const Navbar: React.FC = () => {
 
     const [username, setUsername] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
+
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+    const fetchAllNotifications = async () => {
+        try {
+            const savedNotifications = await getNotifications();
+            setNotifications(savedNotifications);
+
+            const unread = await getUnreadNotifications();
+            setUnreadCount(unread.length);
+        } catch (error) {
+            console.error('Greška prilikom refetchanja notifikacija:', error);
+        }
+    };
+    useEffect(() => {
+        fetchAllNotifications();
+    }, []);
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data?.type === 'INCIDENT_STATUS_UPDATED') {
+                    console.log('Received push-triggered message:', event.data.payload);
+
+                    fetchAllNotifications();
+                }
+            });
+        }
+    }, []);
+
+
+    useEffect(() => {
+        async function fetchUnread() {
+            try {
+                const unreadNotifications = await getUnreadNotifications();
+                setUnreadCount(unreadNotifications.length);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchUnread();
+    }, []);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -69,9 +110,18 @@ const Navbar: React.FC = () => {
         }
     }, [location, navigate]);
 
+    useEffect(() => {
+        const unsubscribe = onMessage(messaging, async (payload) => {
+            await fetchAllNotifications();
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+
+
     const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
     const handleLogout = () => {
-        Cookies.remove('token');
         navigate('/');
         window.location.reload();
     };
@@ -79,17 +129,37 @@ const Navbar: React.FC = () => {
     // Only show Home for non-logged in users
     const getNavItems = () => {
         if (!username) {
-            return [{ name: 'Home', path: '/' }];
+            return [{}];
         }
         return [
             { name: 'Home', path: '/' },
             { name: 'Report Incident', path: '/report' },
-            { name: 'Safety Regulations', path: '/regulations' },
             ...(role === 'Admin' ? [{ name: 'Admin Dashboard', path: '/admin' }] : [])
         ];
     };
 
     const navItems = getNavItems();
+
+    const [hasPermission, setHasPermission] = useState(Notification.permission === 'granted');
+
+    const handleNotificationClick = async () => {
+        if (Notification.permission === 'granted') {
+            return;
+        }
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            await requestFirebaseToken();
+            setHasPermission(true);
+        }
+    };
+
+    const handleBellClick = (event: React.MouseEvent<HTMLElement>) => {
+        markAllNotificationsAsRead();
+        setUnreadCount(0);
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => setAnchorEl(null);
 
     const drawer = (
         <Box sx={{ width: 280 }}>
@@ -142,10 +212,22 @@ const Navbar: React.FC = () => {
                                 </Typography>
                             </Box>
                         </Box>
+                        <IconButton
+                            color={hasPermission ? "primary" : "default"}
+                            onClick={handleNotificationClick}
+                            sx={{
+                                '&:hover': {
+                                    backgroundColor: 'rgba(25, 118, 210, 0.08)'
+                                }
+                            }}
+                        >
+                            <NotificationBell unreadCount={unreadCount} />
+                        </IconButton>
                         <Button
                             fullWidth
                             variant="outlined"
                             color="error"
+                            href="https://localhost:7084/signout"
                             startIcon={<LogOut size={18} />}
                             onClick={handleLogout}
                             sx={{ mt: 2 }}
@@ -210,7 +292,7 @@ const Navbar: React.FC = () => {
                                 onClick={handleDrawerToggle}
                                 sx={{ color: 'text.primary' }}
                             >
-                                <Menu />
+                                <MenuIcon />
                             </IconButton>
                         ) : (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -236,39 +318,129 @@ const Navbar: React.FC = () => {
 
                                 {username ? (
                                     <>
-                                            <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 40 }} />
-                                            <Chip
-                                                avatar={
-                                                    <Avatar sx={{
-                                                        bgcolor: 'warning.main',                                                       
-                                                    }}>
-                                                        {username.charAt(0).toUpperCase()}
-                                                    </Avatar>
-                                                }
-                                                label={
-                                                    <Box>
-                                                        <Typography variant="subtitle2">{username}</Typography>
-                                                        <Typography variant="caption" color="text.secondary">
-                                                            {role}
-                                                        </Typography>
-                                                    </Box>
-                                                }
-                                               
-                                                sx={{
-                                                   
-                                                    backgroundColor: 'white',
-                                                    '.MuiChip-label': { pr: 1 }
-                                                }}
-                                            />
-                                        <IconButton
-                                            color="error"
-                                            onClick={handleLogout}
+                                        <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 40 }} />
+                                        <Chip
+                                            avatar={
+                                                <Avatar sx={{ bgcolor: 'warning.main' }}>
+                                                    {username.charAt(0).toUpperCase()}
+                                                </Avatar>
+                                            }
+                                            label={
+                                                <Box>
+                                                    <Typography variant="subtitle2">{username}</Typography>
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {role}
+                                                    </Typography>
+                                                </Box>
+                                            }
                                             sx={{
-                                                ml: 1,
+                                                backgroundColor: 'white',
+                                                '.MuiChip-label': { pr: 1 }
+                                            }}
+                                        />
+                                        <IconButton
+                                            color={hasPermission ? "primary" : "default"}
+                                            onClick={(e) => {
+                                                handleNotificationClick();
+                                                handleBellClick(e);
+                                            }}
+                                            sx={{
                                                 '&:hover': {
-                                                    backgroundColor: 'rgba(244, 67, 54, 0.08)'
+                                                    backgroundColor: 'rgba(25, 118, 210, 0.08)'
                                                 }
                                             }}
+                                        >
+                                            <NotificationBell unreadCount={unreadCount} />
+                                        </IconButton>
+
+                                            <Menu
+                                                anchorEl={anchorEl}
+                                                open={Boolean(anchorEl)}
+                                                onClose={handleMenuClose}
+                                                PaperProps={{
+                                                    style: {
+                                                        width: '320px',
+                                                        maxHeight: '400px',
+                                                        overflowY: 'auto',
+                                                        padding: '8px 0',
+                                                    }
+                                                }}
+                                                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                            >
+                                                {notifications.length === 0 ? (
+                                                    <MenuItem disabled sx={{ justifyContent: 'center' }}>
+                                                        No notifications
+                                                    </MenuItem>
+                                                ) : (
+                                                    notifications.map((notif) => (
+                                                        <MenuItem
+                                                            key={notif.id}
+                                                            onClick={handleMenuClose}
+                                                            sx={{
+                                                                flexDirection: 'column',
+                                                                alignItems: 'flex-start',
+                                                                whiteSpace: 'normal',
+                                                                wordBreak: 'break-word',
+                                                                py: 1.5,
+                                                                px: 2,
+                                                                borderBottom: '1px solid rgba(0,0,0,0.08)',
+                                                                '&:last-child': { borderBottom: 'none' }
+                                                            }}
+                                                        >
+                                                            <Typography
+                                                                variant="subtitle1"
+                                                                fontWeight={700}
+                                                                sx={{
+                                                                    width: '100%',
+                                                                    whiteSpace: 'normal',
+                                                                    overflowWrap: 'break-word',
+                                                                    mb: 0.5,
+                                                                }}
+                                                            >
+                                                                {notif.title}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="body2"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    width: '100%',
+                                                                    whiteSpace: 'normal',
+                                                                    overflowWrap: 'break-word',
+                                                                }}
+                                                            >
+                                                                {notif.message}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="body2"
+                                                                color="text.secondary"
+                                                                sx={{
+                                                                    width: '100%',
+                                                                    whiteSpace: 'normal',
+                                                                    overflowWrap: 'break-word',
+                                                                }}
+                                                            >
+                                                                {new Intl.DateTimeFormat('en-US', {
+                                                                    day: '2-digit',
+                                                                    month: 'long',
+                                                                    year: 'numeric',
+                                                                    hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                }).format(new Date(notif.receivedAt))}
+                                                            </Typography>
+
+                                                        </MenuItem>
+                                                    ))
+                                                )}
+                                            </Menu>
+
+
+
+                                        <IconButton
+                                            color="error"
+                                            href="https://localhost:7084/signout"
+                                            onClick={handleLogout}
+                                            title="Sign Out"
                                         >
                                             <LogOut size={20} />
                                         </IconButton>

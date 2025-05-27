@@ -40,6 +40,8 @@ namespace SafetyChatbot.Domain.Models
 
         public DateTime LastUpdated { get; set; }
 
+        public string AdminNotes { get; set; }
+
 
     }
 
