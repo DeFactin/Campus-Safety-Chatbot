@@ -1,4 +1,5 @@
-﻿using SafetyChatbot.Domain.Models;
+﻿using Microsoft.AspNetCore.Http;
+using SafetyChatbot.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -30,6 +31,8 @@ namespace SafetyChatbot.Application.Dtos
 
         [Required]
         public string Severity { get; set; }
+
+        public IFormFile? File { get; set; }
 
     }
 }

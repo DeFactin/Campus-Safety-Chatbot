@@ -21,7 +21,6 @@ import { Upload, Clock, AlertCircle, Check } from 'lucide-react';
 import { SeverityLevel } from '../../types/incident';
 import Cookies from 'js-cookie';
 
-
 const incidentTypes = [
     'Theft',
     'Vandalism',
@@ -50,26 +49,22 @@ const IncidentForm: React.FC = () => {
 
     const [activeStep, setActiveStep] = useState(0);
     const [submitted, setSubmitted] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const steps = ['Incident Details', 'Additional Information', 'Review & Submit'];
 
     const getTokenFromCookie = () => {
-        const tokenMatch = document.cookie.match(/(^| )token=([^;]+)/);
-        return tokenMatch ? tokenMatch[2] : null;
+        return Cookies.get('token') || null;
     };
 
-    const token = getTokenFromCookie();
-
     const [formData, setFormData] = useState({
-        reportedBy: '',       
         incidentType: '',     
-        status: 'Pending',           
-        description: '',      
+        status: 'Pending',   
+        reportedBy: 'User',   
+        description: '',     
         date: '',            
-        location: '',         
-        severity: '',         
+        location: '',        
+        severity: '',
     });
-
-    
 
     const [errors, setErrors] = useState({
         incidentType: false,
@@ -79,21 +74,15 @@ const IncidentForm: React.FC = () => {
         severity: false,
     });
 
-
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
-        
         const { name, value } = e.target;
-        console.log("handle input change" + name + value);
         setFormData({
             ...formData,
             [name as string]: value
         });
 
-        // Clear error for this field
         setErrors({
             ...errors,
             [name as string]: false
@@ -105,8 +94,6 @@ const IncidentForm: React.FC = () => {
             setSelectedFile(event.target.files[0]);
         }
     };
-
-
 
     const validateStep = () => {
         let isValid = true;
@@ -144,7 +131,6 @@ const IncidentForm: React.FC = () => {
         if (validateStep()) {
             if (activeStep === steps.length - 1) {
                 handleSubmit();
-
             } else {
                 setActiveStep((prevStep) => prevStep + 1);
             }
@@ -158,17 +144,25 @@ const IncidentForm: React.FC = () => {
     const handleSubmit = async () => {
         try {
             const submissionData = new FormData();
-        
-            submissionData.append("jsonData", JSON.stringify(formData));
-            console.log(JSON.stringify(formData));
+            submissionData.append("IncidentType", formData.incidentType);
+            submissionData.append("Status", formData.status);
+            submissionData.append("ReportedBy", formData.reportedBy);
+            submissionData.append("Description", formData.description);
+
+            const dateValue = new Date(formData.date);
+            submissionData.append("Date", dateValue.toISOString());
+
+            submissionData.append("Location", formData.location);
+            submissionData.append("Severity", formData.severity);
 
             if (selectedFile) {
-                submissionData.append("file", selectedFile);
+                submissionData.append("File", selectedFile);
             }
-            console.log(JSON.stringify(submissionData));
+
+
             const response = await fetch('/api/incidentreports', {
                 method: "POST",
-                body: submissionData, // Do not set Content-Type here
+                body: submissionData,
             });
 
             if (response.ok) {
@@ -176,14 +170,15 @@ const IncidentForm: React.FC = () => {
                 console.log("Submitted successfully:", result);
                 setSubmitted(true);
             } else {
-                console.error("Failed to submit:", response.statusText);
+                const errorData = await response.json().catch(() => null);
+                console.error("Failed to submit:", response.statusText, errorData);
+                setSubmitError(errorData?.message || 'Failed to submit report. Please try again.');
             }
         } catch (error) {
             console.error("Error during submission:", error);
+            setSubmitError('An unexpected error occurred. Please try again.');
         }
     };
-
-
 
     const getSeverityColor = (severity: SeverityLevel) => {
         switch (severity) {
@@ -220,9 +215,6 @@ const IncidentForm: React.FC = () => {
                     <Typography variant="body1" color="text.secondary" paragraph sx={{ textAlign: 'center' }}>
                         Thank you for submitting your incident report. Your report has been logged successfully and our team will review it shortly.
                     </Typography>
-                    <Typography variant="body1" fontWeight={500} paragraph>
-                        Reference Number: INC-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}
-                    </Typography>
                     <Button
                         variant="contained"
                         color="primary"
@@ -230,14 +222,15 @@ const IncidentForm: React.FC = () => {
                             setSubmitted(false);
                             setActiveStep(0);
                             setFormData({
-                                reportedBy: '',
                                 incidentType: '',
                                 status: 'Pending',
+                                reportedBy: 'User',
                                 description: '',
                                 date: '',
                                 location: '',
                                 severity: '',
                             });
+                            setSelectedFile(null);
                         }}
                         sx={{ mt: 2 }}
                     >
@@ -263,6 +256,12 @@ const IncidentForm: React.FC = () => {
                 ))}
             </Stepper>
 
+            {submitError && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                    {submitError}
+                </Alert>
+            )}
+
             <Box sx={{ mt: 4 }}>
                 {activeStep === 0 && (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -274,12 +273,13 @@ const IncidentForm: React.FC = () => {
                                 Please provide the essential details about the incident.
                             </Typography>
                         </Box>
+
                         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 3 }}>
                             <FormControl fullWidth error={errors.incidentType} sx={{ flex: 1 }}>
                                 <InputLabel id="incident-type-label">Incident Type *</InputLabel>
                                 <Select
                                     labelId="incident-type-label"
-                                    id="incident-type"
+                                    id="incidentType"
                                     name="incidentType"
                                     value={formData.incidentType}
                                     label="Incident Type *"
@@ -360,11 +360,11 @@ const IncidentForm: React.FC = () => {
                             />
                         </Box>
                         <Box>
-                            <FormControl fullWidth error={errors.severityLevel}>
+                            <FormControl fullWidth error={errors.severity}>
                                 <InputLabel id="severity-label">Severity Level *</InputLabel>
                                 <Select
                                     labelId="severity-label"
-                                    id="severityLevel"
+                                    id="severity"
                                     name="severity"
                                     value={formData.severity}
                                     label="Severity Level *"
@@ -372,7 +372,7 @@ const IncidentForm: React.FC = () => {
                                     startAdornment={formData.severity ? (
                                         <AlertCircle
                                             size={18}
-                                            color={getSeverityColor(formData.severity)}
+                                            color={getSeverityColor(formData.severity as SeverityLevel)}
                                             style={{ marginRight: '8px' }}
                                         />
                                     ) : undefined}
@@ -462,7 +462,7 @@ const IncidentForm: React.FC = () => {
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <AlertCircle
                                         size={18}
-                                        color={getSeverityColor(formData.severity)}
+                                        color={getSeverityColor(formData.severity as SeverityLevel)}
                                         style={{ marginRight: '8px' }}
                                     />
                                     <Typography variant="body1" fontWeight={500} paragraph>
@@ -491,7 +491,6 @@ const IncidentForm: React.FC = () => {
                                 </Typography>
                             </Box>
                         )}
-
                     </Box>
                 )}
 

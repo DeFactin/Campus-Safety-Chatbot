@@ -484,6 +484,7 @@ $RECYCLE.BIN/
 *.swp
 
 # React/Node.js specific ignores
+safetychatbot.api/uploadedfiles
 safetychatbot.client/node_modules/
 safetychatbot.client/dist/
 safetychatbot.client/.env

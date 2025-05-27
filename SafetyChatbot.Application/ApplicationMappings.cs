@@ -11,7 +11,6 @@ namespace SafetyChatbot.Api.MappingProfiles
         {
             CreateMap<IncidentReport, IncidentReportDto>().ReverseMap();
             CreateMap<IncidentReport, SubmitIncidentReportDto>().ReverseMap();
-
         }
     }
 }
