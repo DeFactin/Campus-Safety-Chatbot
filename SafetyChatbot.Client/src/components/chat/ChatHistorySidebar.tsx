@@ -8,7 +8,8 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
-    Box
+    Box,
+    Button
 } from '@mui/material';
 import { MessageSquare, Clock } from 'lucide-react';
 import { useTheme } from '@mui/material/styles';
@@ -18,12 +19,14 @@ interface ChatHistorySidebarProps {
     chatHistory: ChatHistory[];
     selectedChat: string | null;
     onChatSelect: (chatId: string) => void;
+    onNewChat: () => void;
 }
 
 const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                                                                    chatHistory,
                                                                    selectedChat,
-                                                                   onChatSelect
+                                                                   onChatSelect,
+                                                                   onNewChat
                                                                }) => {
     const theme = useTheme();
 
@@ -37,12 +40,25 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                 overflow: 'hidden'
             }}
         >
-            <CardContent sx={{ p: 2, height: '100%' }}>
+            <CardContent sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <Typography variant="h6" fontWeight={600} gutterBottom>
                     Chat History
                 </Typography>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={onNewChat}
+                    sx={{ mb: 2, mt:2 }}
+                >
+                    Start New Conversation
+                </Button>
                 <Divider sx={{ mb: 2 }} />
-                <List sx={{ overflow: 'auto', height: 'calc(100% - 60px)' }}>
+                <List sx={{ overflow: 'auto', flexGrow: 1 }}>
+                    {chatHistory.length === 0 && (
+                        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 3 }}>
+                            No chat history available.
+                        </Typography>
+                    )}
                     {chatHistory.map((chat) => (
                         <ListItemButton
                             key={chat.id}
@@ -77,7 +93,7 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                                         fontSize: '0.75rem'
                                     }}>
                                         <Clock size={14} />
-                                        {chat.timestamp.toLocaleDateString()}
+                                        {new Date(chat.timestamp).toLocaleDateString()}
                                     </Box>
                                 }
                                 secondaryTypographyProps={{

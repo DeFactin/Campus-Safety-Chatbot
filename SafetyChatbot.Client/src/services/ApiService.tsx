@@ -24,12 +24,19 @@ export const getIncidents = async () => {
 }
 
 
-// Send a message to Dialogflow chatbot
+export const fetchChatSessions = async () => {
+    const response = await api.get('/chatbot/sessions');
+    return response.data;
+};
+export const fetchChatHistory = async (sessionId: string) => {
+    const response = await api.get(`/chatbot/history/${sessionId}`);
+    return response.data;
+};
+// existing sendChatMessage remains unchanged
 export const sendChatMessage = async (sessionId: string, message: string) => {
-    const response = await api.post('/chatbot/message', { sessionId, message })
-    return response.data.reply
-}
-
+    const response = await api.post('/chatbot/message', { sessionId, message });
+    return response.data.reply;
+};
 // Type for new incident report
 export interface NewIncident {
     incidentType: string;
