@@ -34,7 +34,7 @@ namespace SafetyChatbot.Application.Dtos
 
         public DateTime LastUpdated { get; set; }
 
-        public string AdminNotes { get; set; }
+        public string? AdminNotes { get; set; }
 
         public string? FilePath { get; set; }
 
