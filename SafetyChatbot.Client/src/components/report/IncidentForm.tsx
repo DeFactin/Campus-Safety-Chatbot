@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { Upload, Clock, AlertCircle, Check } from 'lucide-react';
 import { SeverityLevel } from '../../types/incident';
+import Cookies from 'js-cookie';
 
 const incidentTypes = [
     'Theft',
@@ -33,16 +34,12 @@ const incidentTypes = [
 ];
 
 const locations = [
-    'Library Building',
-    'Faculty of Engineering',
-    'Faculty of Arts',
-    'Student Center',
-    'Dormitory A',
-    'Dormitory B',
+    'Building A',
+    'Building B',
+    'RDC',
     'Sports Hall',
-    'Parking Lot A',
-    'Parking Lot B',
-    'Campus Entry Gate',
+    'Parking Lot',
+    'Campus Grounds',
     'Other'
 ];
 
@@ -52,24 +49,32 @@ const IncidentForm: React.FC = () => {
 
     const [activeStep, setActiveStep] = useState(0);
     const [submitted, setSubmitted] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const steps = ['Incident Details', 'Additional Information', 'Review & Submit'];
 
+    const getTokenFromCookie = () => {
+        return Cookies.get('token') || null;
+    };
+
     const [formData, setFormData] = useState({
-        type: '',
-        location: '',
-        date: '',
-        description: '',
-        severityLevel: '' as SeverityLevel,
-        evidenceFile: '',
+        incidentType: '',     
+        status: 'Pending',   
+        reportedBy: 'User',   
+        description: '',     
+        date: '',            
+        location: '',        
+        severity: '',
     });
 
     const [errors, setErrors] = useState({
-        type: false,
+        incidentType: false,
         location: false,
         date: false,
         description: false,
-        severityLevel: false
+        severity: false,
     });
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
         const { name, value } = e.target;
@@ -78,19 +83,15 @@ const IncidentForm: React.FC = () => {
             [name as string]: value
         });
 
-        // Clear error for this field
         setErrors({
             ...errors,
             [name as string]: false
         });
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setFormData({
-                ...formData,
-                evidenceFile: e.target.files[0].name
-            });
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setSelectedFile(event.target.files[0]);
         }
     };
 
@@ -99,8 +100,8 @@ const IncidentForm: React.FC = () => {
         const newErrors = { ...errors };
 
         if (activeStep === 0) {
-            if (!formData.type) {
-                newErrors.type = true;
+            if (!formData.incidentType) {
+                newErrors.incidentType = true;
                 isValid = false;
             }
             if (!formData.location) {
@@ -116,8 +117,8 @@ const IncidentForm: React.FC = () => {
                 newErrors.description = true;
                 isValid = false;
             }
-            if (!formData.severityLevel) {
-                newErrors.severityLevel = true;
+            if (!formData.severity) {
+                newErrors.severity = true;
                 isValid = false;
             }
         }
@@ -140,10 +141,43 @@ const IncidentForm: React.FC = () => {
         setActiveStep((prevStep) => prevStep - 1);
     };
 
-    const handleSubmit = () => {
-        // Submit logic would go here (API call, etc.)
-        console.log("Form submitted:", formData);
-        setSubmitted(true);
+    const handleSubmit = async () => {
+        try {
+            const submissionData = new FormData();
+            submissionData.append("IncidentType", formData.incidentType);
+            submissionData.append("Status", formData.status);
+            submissionData.append("ReportedBy", formData.reportedBy);
+            submissionData.append("Description", formData.description);
+
+            const dateValue = new Date(formData.date);
+            submissionData.append("Date", dateValue.toISOString());
+
+            submissionData.append("Location", formData.location);
+            submissionData.append("Severity", formData.severity);
+
+            if (selectedFile) {
+                submissionData.append("File", selectedFile);
+            }
+
+
+            const response = await fetch('/api/incidentreports', {
+                method: "POST",
+                body: submissionData,
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log("Submitted successfully:", result);
+                setSubmitted(true);
+            } else {
+                const errorData = await response.json().catch(() => null);
+                console.error("Failed to submit:", response.statusText, errorData);
+                setSubmitError(errorData?.message || 'Failed to submit report. Please try again.');
+            }
+        } catch (error) {
+            console.error("Error during submission:", error);
+            setSubmitError('An unexpected error occurred. Please try again.');
+        }
     };
 
     const getSeverityColor = (severity: SeverityLevel) => {
@@ -181,9 +215,6 @@ const IncidentForm: React.FC = () => {
                     <Typography variant="body1" color="text.secondary" paragraph sx={{ textAlign: 'center' }}>
                         Thank you for submitting your incident report. Your report has been logged successfully and our team will review it shortly.
                     </Typography>
-                    <Typography variant="body1" fontWeight={500} paragraph>
-                        Reference Number: INC-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}
-                    </Typography>
                     <Button
                         variant="contained"
                         color="primary"
@@ -191,13 +222,15 @@ const IncidentForm: React.FC = () => {
                             setSubmitted(false);
                             setActiveStep(0);
                             setFormData({
-                                type: '',
-                                location: '',
-                                date: '',
+                                incidentType: '',
+                                status: 'Pending',
+                                reportedBy: 'User',
                                 description: '',
-                                severityLevel: '' as SeverityLevel,
-                                evidenceFile: '',
+                                date: '',
+                                location: '',
+                                severity: '',
                             });
+                            setSelectedFile(null);
                         }}
                         sx={{ mt: 2 }}
                     >
@@ -223,6 +256,12 @@ const IncidentForm: React.FC = () => {
                 ))}
             </Stepper>
 
+            {submitError && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                    {submitError}
+                </Alert>
+            )}
+
             <Box sx={{ mt: 4 }}>
                 {activeStep === 0 && (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -234,14 +273,15 @@ const IncidentForm: React.FC = () => {
                                 Please provide the essential details about the incident.
                             </Typography>
                         </Box>
+
                         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 3 }}>
-                            <FormControl fullWidth error={errors.type} sx={{ flex: 1 }}>
+                            <FormControl fullWidth error={errors.incidentType} sx={{ flex: 1 }}>
                                 <InputLabel id="incident-type-label">Incident Type *</InputLabel>
                                 <Select
                                     labelId="incident-type-label"
-                                    id="incident-type"
-                                    name="type"
-                                    value={formData.type}
+                                    id="incidentType"
+                                    name="incidentType"
+                                    value={formData.incidentType}
                                     label="Incident Type *"
                                     onChange={handleInputChange}
                                 >
@@ -249,7 +289,7 @@ const IncidentForm: React.FC = () => {
                                         <MenuItem key={type} value={type}>{type}</MenuItem>
                                     ))}
                                 </Select>
-                                {errors.type && (
+                                {errors.incidentType && (
                                     <FormHelperText>Incident type is required</FormHelperText>
                                 )}
                             </FormControl>
@@ -320,19 +360,19 @@ const IncidentForm: React.FC = () => {
                             />
                         </Box>
                         <Box>
-                            <FormControl fullWidth error={errors.severityLevel}>
+                            <FormControl fullWidth error={errors.severity}>
                                 <InputLabel id="severity-label">Severity Level *</InputLabel>
                                 <Select
                                     labelId="severity-label"
-                                    id="severityLevel"
-                                    name="severityLevel"
-                                    value={formData.severityLevel}
+                                    id="severity"
+                                    name="severity"
+                                    value={formData.severity}
                                     label="Severity Level *"
                                     onChange={handleInputChange}
-                                    startAdornment={formData.severityLevel ? (
+                                    startAdornment={formData.severity ? (
                                         <AlertCircle
                                             size={18}
-                                            color={getSeverityColor(formData.severityLevel)}
+                                            color={getSeverityColor(formData.severity as SeverityLevel)}
                                             style={{ marginRight: '8px' }}
                                         />
                                     ) : undefined}
@@ -341,7 +381,7 @@ const IncidentForm: React.FC = () => {
                                     <MenuItem value="medium">Medium</MenuItem>
                                     <MenuItem value="low">Low</MenuItem>
                                 </Select>
-                                {errors.severityLevel && (
+                                {errors.severity && (
                                     <FormHelperText>Severity level is required</FormHelperText>
                                 )}
                             </FormControl>
@@ -364,9 +404,9 @@ const IncidentForm: React.FC = () => {
                                     onChange={handleFileChange}
                                 />
                             </Button>
-                            {formData.evidenceFile && (
+                            {selectedFile && (
                                 <Typography variant="body2" sx={{ mt: 1 }}>
-                                    Selected file: {formData.evidenceFile}
+                                    Selected file: {selectedFile.name}
                                 </Typography>
                             )}
                         </Box>
@@ -393,7 +433,7 @@ const IncidentForm: React.FC = () => {
                                     Incident Type
                                 </Typography>
                                 <Typography variant="body1" fontWeight={500} paragraph>
-                                    {formData.type}
+                                    {formData.incidentType}
                                 </Typography>
                             </Box>
                             <Box sx={{ flex: 1 }}>
@@ -422,11 +462,11 @@ const IncidentForm: React.FC = () => {
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <AlertCircle
                                         size={18}
-                                        color={getSeverityColor(formData.severityLevel)}
+                                        color={getSeverityColor(formData.severity as SeverityLevel)}
                                         style={{ marginRight: '8px' }}
                                     />
                                     <Typography variant="body1" fontWeight={500} paragraph>
-                                        {formData.severityLevel.charAt(0).toUpperCase() + formData.severityLevel.slice(1)}
+                                        {formData.severity.charAt(0).toUpperCase() + formData.severity.slice(1)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -441,13 +481,13 @@ const IncidentForm: React.FC = () => {
                             </Typography>
                         </Box>
 
-                        {formData.evidenceFile && (
+                        {selectedFile && (
                             <Box>
                                 <Typography variant="subtitle2" color="text.secondary">
                                     Evidence Attached
                                 </Typography>
                                 <Typography variant="body1" paragraph>
-                                    {formData.evidenceFile}
+                                    {selectedFile.name}
                                 </Typography>
                             </Box>
                         )}

@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using FirebaseAdmin.Messaging;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SafetyChatbot.Application;
@@ -12,6 +10,8 @@ using SafetyChatbot.Domain.Models;
 using SafetyChatbot.Infrastructure;
 using SafetyChatbot.Infrastructure.Repositories;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SafetyChatbot.Api.Controllers
 {
@@ -59,14 +59,54 @@ namespace SafetyChatbot.Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult<IncidentReportDto> Submit([FromBody] SubmitIncidentReportDto dto)
+        [RequestSizeLimit(10_000_000)]
+        public async Task<ActionResult<IncidentReportDto>> Submit([FromForm] SubmitIncidentReportDto dto)
         {
-            var report = _mapper.Map<IncidentReport>(dto);
-            _incidentReportRepository.Add(report);
+            try
+            {
+                if (dto == null)
+                {
+                    Console.WriteLine("DTO binding failed.");
+                    return BadRequest("Invalid data.");
+                }
 
-            var resultDto = _mapper.Map<IncidentReportDto>(report);
-            return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
+               
+                string? savedFilePath = null;
+                if (dto.File != null && dto.File.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = $"{Guid.NewGuid()}_{dto.File.FileName}";
+                    savedFilePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(savedFilePath, FileMode.Create))
+                    {
+                        await dto.File.CopyToAsync(stream);
+                    }
+                }
+
+              
+                var report = _mapper.Map<IncidentReport>(dto);
+
+                if (!string.IsNullOrEmpty(savedFilePath))
+                {
+                    report.FilePath = savedFilePath;
+                }
+
+                _incidentReportRepository.Add(report);
+
+                var resultDto = _mapper.Map<IncidentReportDto>(report);
+                return CreatedAtAction(nameof(GetById), new { id = resultDto.Id }, resultDto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "An error occurred while processing your request." });
+            }
         }
+
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
@@ -80,7 +120,7 @@ namespace SafetyChatbot.Api.Controllers
 
             _mapper.Map(dto, existing);
             _incidentReportRepository.Update(id, existing);
-           
+
             var resultDto = _mapper.Map<IncidentReportDto>(existing);
             return Ok(resultDto);
         }
@@ -166,7 +206,7 @@ namespace SafetyChatbot.Api.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-
+         
             _incidentReportRepository.Delete(id);
             return NoContent();
         }

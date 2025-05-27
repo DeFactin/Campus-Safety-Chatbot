@@ -40,4 +40,10 @@
     <ProjectReference Include="..\SafetyChatbot.Infrastructure\SafetyChatbot.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UploadedFiles\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/ava.json" /></VisualStudio></ProjectExtensions>
+
 </Project>
