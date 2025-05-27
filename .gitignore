@@ -5,6 +5,7 @@
 
 # dotenv files
 .env
+.serviceAccountKey.json
 
 # User-specific files
 *.rsuser
@@ -504,3 +505,6 @@ safetychatbot.client/coverage/
 # Vite specific
 safetychatbot.client/.vite/
 safetychatbot.client/*.local
+SafetyChatbot.Api/serviceAccountKey.json
+SafetyChatbot.Api/appsettings.Development.json
+SafetyChatbot.Api/appsettings.json

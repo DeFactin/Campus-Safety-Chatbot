@@ -12,4 +12,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<SafetyRegulation> SafetyRegulations { get; set; }
 
     public DbSet<IncidentReport> IncidentReports { get; set; } 
+    public DbSet<ChatSession> ChatSessions { get; set; }
+    public DbSet<ChatMessage> ChatMessages { get; set; }
+    public DbSet<PushToken> PushTokens { get; set; }
+
+    public DbSet<NotificationRecord> Notifications { get; set; }
 }

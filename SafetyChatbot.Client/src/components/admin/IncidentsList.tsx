@@ -225,7 +225,7 @@ const IncidentsList: React.FC = () => {
                             <TableCell>Date</TableCell>
                             <TableCell>Severity</TableCell>
                             <TableCell>Status</TableCell>
-                            <TableCell>Description</TableCell>
+                           
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -272,15 +272,7 @@ const IncidentsList: React.FC = () => {
                                             {getStatusIcon(incident.status)}
                                         </Box>
                                     </TableCell>
-                                    <TableCell sx={{ maxWidth: 200 }}>
-                                        <Typography
-                                            variant="body2"
-                                            noWrap
-                                            sx={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
-                                        >
-                                            {incident.description}
-                                        </Typography>
-                                    </TableCell>
+                                   
                                 </TableRow>
                             ))
                         ) : (

@@ -51,11 +51,13 @@ namespace SafetyChatbot.Api.Controllers
                         ?? User.FindFirst("role")?.Value
                         ?? User.FindFirst("roles")?.Value
                         ?? "User";
+            var preferredUsername = User.FindFirst("preferred_username")?.Value;
 
             var tokenClaims = new[]
             {
                 new Claim("name", name),
-                new Claim("role", role)
+                new Claim("role", role),
+                new Claim("email", preferredUsername ?? string.Empty),
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
