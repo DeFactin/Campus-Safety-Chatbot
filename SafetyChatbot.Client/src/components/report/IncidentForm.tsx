@@ -20,6 +20,7 @@ import {
 import { Upload, Clock, AlertCircle, Check } from 'lucide-react';
 import { SeverityLevel } from '../../types/incident';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 const incidentTypes = [
     'Theft',
@@ -53,13 +54,22 @@ const IncidentForm: React.FC = () => {
     const steps = ['Incident Details', 'Additional Information', 'Review & Submit'];
 
     const getTokenFromCookie = () => {
-        return Cookies.get('token') || null;
+        const token = Cookies.get('token');
+        const decoded: DecodedToken = jwtDecode(token);
+        return decoded.email;
+    };
+
+    type DecodedToken = {
+        name: string;
+        email: string;
+        role: string;
+        exp: number;
     };
 
     const [formData, setFormData] = useState({
         incidentType: '',     
-        status: 'Pending',   
-        reportedBy: 'User',   
+        status: 'Pending',
+        reportedBy: getTokenFromCookie(),   
         description: '',     
         date: '',            
         location: '',        
