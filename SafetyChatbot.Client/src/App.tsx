@@ -27,23 +27,23 @@ function App() {
                     <Route path="/admin" element={
                         <ProtectedRoute requiredRole="Admin">
                             <AdminDashboardPage />
-                        </ProtectedRoute>} />
+                        </ProtectedRoute>
+                    } />
                     <Route path="/admin/incidents/:id" element={
                         <ProtectedRoute requiredRole="Admin">
                             <IncidentDetailsPage />
                         </ProtectedRoute>
                     } />
                     <Route path="/chat" element={
-                    <ProtectedRoute requiredRole="User">
-                        <ChatPage />
-                    </ProtectedRoute>} />
+                        <ProtectedRoute requiredRole="User">
+                            <ChatPage />
+                        </ProtectedRoute>} />
 
                     <Route path="/admin/:id" element={<IncidentDetailsPage />} />
-                    
+
                 </Routes>
             </Router>
         </ThemeProvider>
-    );
+    )
 }
-
 export default App;

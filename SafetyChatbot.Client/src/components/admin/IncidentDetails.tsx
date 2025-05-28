@@ -31,27 +31,6 @@ import {
 import { Incident, IncidentStatus, SeverityLevel } from '../../types/incident';
 import { jsPDF } from "jspdf";
 
-interface IncidentDetailsProps {
-    incident: Incident;
-}
-const loadLogoAsBase64 = (url: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "Anonymous"; // Bitno za lokalne slike
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d");
-      ctx?.drawImage(img, 0, 0);
-      const dataURL = canvas.toDataURL("image/png");
-      resolve(dataURL);
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
-};
-
 
 const IncidentDetails: React.FC = () => {
 
@@ -63,11 +42,9 @@ const IncidentDetails: React.FC = () => {
         const topMargin = 20;
         const lineSpacing = 8;
 
-        // Font i velièina
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
 
-        // Pripremi logo
         let logoHeight = 0;
         try {
             const logo = new Image();
@@ -77,26 +54,25 @@ const IncidentDetails: React.FC = () => {
                 logo.onerror = rej;
             });
 
-            const targetHeight = 20; // visina da odgovara tekstu
+            const targetHeight = 20; 
             const aspectRatio = logo.width / logo.height;
             const logoWidth = targetHeight * aspectRatio;
             logoHeight = targetHeight;
 
-            const xLogo = 190 - logoWidth; // desno poravnato
+            const xLogo = 190 - logoWidth; 
             doc.addImage(logo, "PNG", xLogo, topMargin, logoWidth, logoHeight);
         } catch (error) {
             console.error("Logo nije uèitan:", error);
         }
 
-        // Naslov u liniji s logom
         doc.text("Incident Report", marginLeft, topMargin + logoHeight * 0.8);
 
-        // Linija ispod
+       
         const yLine = topMargin + logoHeight + 4;
         doc.setLineWidth(0.5);
         doc.line(marginLeft, yLine, 190, yLine);
 
-        // Dalji sadržaj
+       
         let y = yLine + lineSpacing;
 
         doc.setFontSize(12);
@@ -147,7 +123,6 @@ const IncidentDetails: React.FC = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const [incident, setIncident] = useState<Incident | null>(null);
     const [status, setStatus] = useState<string>('');
 
@@ -158,7 +133,7 @@ const IncidentDetails: React.FC = () => {
                 const data: Incident = await response.json();
                 setIncident(data);
                 setStatus(data.status);
-                setNotes(data.adminNotes || ''); // Set initial notes
+                setNotes(data.adminNotes || ''); 
 
             } catch (error) {
                 console.error("Failed to fetch incident:", error);
@@ -194,7 +169,7 @@ const IncidentDetails: React.FC = () => {
             }
 
             const updatedIncident: Incident = await response.json();
-            setIncident(updatedIncident); // Keep UI in sync
+            setIncident(updatedIncident); 
             setSnackbarOpen(true);
         } catch (error) {
             console.error('Error saving notes:', error);
@@ -206,18 +181,12 @@ const IncidentDetails: React.FC = () => {
         if (!incident) return;
 
         const updatedIncidentPayload = {
-            reportedBy: incident.reportedBy,
-            incidentType: incident.incidentType,
-            description: incident.description,
-            date: incident.date,
-            location: incident.location,
-            severity: incident.severity,
-            status: status // <- updated
+            status: status 
         };
 
         try {
             const response = await fetch(`/api/incidentreports/${incident.id}`, {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -235,9 +204,7 @@ const IncidentDetails: React.FC = () => {
             console.error('Error updating incident:', error);
         }
 
-        useEffect(() => {
-            window.scrollTo(0, 0);
-        }, []);
+      
     };
 
 

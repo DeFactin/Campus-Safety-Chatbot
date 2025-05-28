@@ -1,15 +1,20 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SafetyChatbot.Api.MappingProfiles;
-using SafetyChatbot.Infrastructure.Repositories;
 using Microsoft.Identity.Web;
-using System.Security.Authentication;
-using SafetyChatbot.Domain.Models;
+using SafetyChatbot.Api.MappingProfiles;
 using SafetyChatbot.Application.Services;
+using SafetyChatbot.Domain.Models;
+using SafetyChatbot.Infrastructure.Repositories;
+using System.Security.Authentication;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment.EnvironmentName;
 
 // Get the connection string directly
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -37,6 +42,11 @@ builder.Services.AddCors(options =>
         policy => policy.AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader());
+});
+
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("serviceAccountKey.json")
 });
 
 // Register DialogflowService

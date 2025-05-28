@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="FirebaseAdmin" Version="2.5.0" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
     <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="4.26.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0" />
@@ -37,5 +39,11 @@
     <ProjectReference Include="..\SafetyChatbot.Application\SafetyChatbot.Application.csproj" />
     <ProjectReference Include="..\SafetyChatbot.Infrastructure\SafetyChatbot.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UploadedFiles\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/ava.json" /></VisualStudio></ProjectExtensions>
 
 </Project>
