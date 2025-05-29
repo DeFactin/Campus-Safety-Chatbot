@@ -1,11 +1,12 @@
-﻿#root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
+﻿body {
+    color: #213D73;
+    -webkit-font-smoothing: antialiased; /* Optional: smoother text */
+    background-color: #213D73;
+}
+
+#root {
+    padding : 0;
     text-align: center;
 }
 
-th, td {
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
+
