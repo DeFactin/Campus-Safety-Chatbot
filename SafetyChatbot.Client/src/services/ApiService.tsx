@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create an Axios instance
 const api = axios.create({
-    baseURL: 'https://localhost:7084/api',  // Correct base URL for your backend
+    baseURL: '/api',  
 })
 
 // Fetch all safety guidelines
@@ -17,4 +17,53 @@ export const createGuideline = async (newGuideline: { title: string; description
     return response.data
 }
 
-// Other API calls 
+// get incident reports 
+export const getIncidents = async () => {
+    const response = await api.get('/incidentreports')
+    return response.data
+}
+
+
+export const fetchChatSessions = async () => {
+    const response = await api.get('/chatbot/sessions');
+    return response.data;
+};
+export const fetchChatHistory = async (sessionId: string) => {
+    const response = await api.get(`/chatbot/history/${sessionId}`);
+    return response.data;
+};
+// existing sendChatMessage remains unchanged
+export const sendChatMessage = async (sessionId: string, message: string) => {
+    const response = await api.post('/chatbot/message', { sessionId, message });
+    return response.data.reply;
+};
+// Type for new incident report
+export interface NewIncident {
+    incidentType: string;
+    description: string;
+    date: string;  // Use ISO date string (e.g., "2025-04-22")
+    location: string;
+    severityLevel: 'low' | 'medium' | 'high';
+    status:string
+}
+
+// Submit a new incident report
+export const createIncident = async (newIncident: NewIncident) => {
+    const response = await api.post('/incidentreports', newIncident);
+    return response.data
+}
+
+// Fetch all notifications for the logged-in user
+export const getNotifications = async () => {
+    const response = await api.get('/push/get-notifications')
+    return response.data
+}
+
+export const markAllNotificationsAsRead = async () => {
+    await api.post('/push/mark-all-read');
+};
+
+export const getUnreadNotifications = async () => {
+    const response = await api.get('/push/get-unread-notifications');
+    return response.data;
+};
