@@ -29,19 +29,100 @@ import {
     Check
 } from 'lucide-react';
 import { Incident, IncidentStatus, SeverityLevel } from '../../types/incident';
+import { jsPDF } from "jspdf";
 
-interface IncidentDetailsProps {
-    incident: Incident;
-}
 
-const IncidentDetails: React.FC= () => {
+const IncidentDetails: React.FC = () => {
+
+    const handlePrintReport = async () => {
+        if (!incident) return;
+
+        const doc = new jsPDF();
+        const marginLeft = 20;
+        const topMargin = 20;
+        const lineSpacing = 8;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+
+        let logoHeight = 0;
+        try {
+            const logo = new Image();
+            logo.src = "/logoDark.png";
+            await new Promise((res, rej) => {
+                logo.onload = res;
+                logo.onerror = rej;
+            });
+
+            const targetHeight = 20; 
+            const aspectRatio = logo.width / logo.height;
+            const logoWidth = targetHeight * aspectRatio;
+            logoHeight = targetHeight;
+
+            const xLogo = 190 - logoWidth; 
+            doc.addImage(logo, "PNG", xLogo, topMargin, logoWidth, logoHeight);
+        } catch (error) {
+            console.error("Logo nije uèitan:", error);
+        }
+
+        doc.text("Incident Report", marginLeft, topMargin + logoHeight * 0.8);
+
+       
+        const yLine = topMargin + logoHeight + 4;
+        doc.setLineWidth(0.5);
+        doc.line(marginLeft, yLine, 190, yLine);
+
+       
+        let y = yLine + lineSpacing;
+
+        doc.setFontSize(12);
+        const addField = (label: string, value: string) => {
+            doc.setFont("helvetica", "bold");
+            doc.text(`${label}:`, marginLeft, y);
+            doc.setFont("helvetica", "normal");
+            doc.text(value, marginLeft + 40, y);
+            y += lineSpacing;
+        };
+
+        addField("Incident ID", String(incident.id));
+        addField("Type", incident.incidentType);
+        addField("Reported By", incident.reportedBy);
+        addField("Status", incident.status);
+        addField("Severity", incident.severity);
+        addField("Location", incident.location);
+        addField("Date", new Date(incident.date).toLocaleString());
+        addField("Last Updated", new Date(incident.lastUpdated).toLocaleString());
+
+        y += lineSpacing;
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Description:", marginLeft, y);
+        y += lineSpacing;
+        doc.setFont("helvetica", "normal");
+        const descriptionLines = doc.splitTextToSize(incident.description, 170);
+        doc.text(descriptionLines, marginLeft, y);
+        y += descriptionLines.length * lineSpacing;
+
+        if (notes.trim() !== "") {
+            y += lineSpacing;
+            doc.setFont("helvetica", "bold");
+            doc.text("Admin Notes:", marginLeft, y);
+            y += lineSpacing;
+            doc.setFont("helvetica", "normal");
+            const notesLines = doc.splitTextToSize(notes.trim(), 170);
+            doc.text(notesLines, marginLeft, y);
+        }
+
+        doc.save(`Incident_Report_${incident.id}.pdf`);
+    };
+
     const theme = useTheme();
     //const [status, setStatus] = useState<IncidentStatus>(incident.status);
+
     const [notes, setNotes] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
     const [incident, setIncident] = useState<Incident | null>(null);
     const [status, setStatus] = useState<string>('');
 
@@ -52,6 +133,8 @@ const IncidentDetails: React.FC= () => {
                 const data: Incident = await response.json();
                 setIncident(data);
                 setStatus(data.status);
+                setNotes(data.adminNotes || ''); 
+
             } catch (error) {
                 console.error("Failed to fetch incident:", error);
             }
@@ -69,22 +152,41 @@ const IncidentDetails: React.FC= () => {
         setNotes(event.target.value);
     };
 
+    const handleSaveNotes = async () => {
+        if (!incident || notes.trim() === '') return;
+
+        try {
+            const response = await fetch(`/api/incidentreports/${incident.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ adminNotes: notes })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update notes');
+            }
+
+            const updatedIncident: Incident = await response.json();
+            setIncident(updatedIncident); 
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error('Error saving notes:', error);
+        }
+    };
+
+
     const handleUpdateIncident = async () => {
         if (!incident) return;
 
         const updatedIncidentPayload = {
-            reportedBy: incident.reportedBy,
-            incidentType: incident.incidentType,
-            description: incident.description,
-            date: incident.date,
-            location: incident.location,
-            severity: incident.severity,
-            status: status // <- updated
+            status: status 
         };
 
         try {
             const response = await fetch(`/api/incidentreports/${incident.id}`, {
-                method: 'PUT',
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -102,9 +204,7 @@ const IncidentDetails: React.FC= () => {
             console.error('Error updating incident:', error);
         }
 
-        useEffect(() => {
-            window.scrollTo(0, 0);
-        }, []);
+      
     };
 
 
@@ -247,7 +347,7 @@ const IncidentDetails: React.FC= () => {
                             variant="contained"
                             color="primary"
                             disabled={notes.trim() === ''}
-                            onClick={handleUpdateIncident}
+                            onClick={handleSaveNotes}
                             startIcon={<Check size={18} />}
                         >
                             Save Notes
@@ -317,11 +417,8 @@ const IncidentDetails: React.FC= () => {
                         </Typography>
                         <Divider sx={{ my: 2 }} />
 
-                        <Button variant="outlined" fullWidth sx={{ mb: 2 }}>
+                        <Button variant="outlined" fullWidth sx={{ mb: 2 }} onClick={handlePrintReport}>
                             Print Report
-                        </Button>
-                        <Button variant="outlined" color="error" fullWidth>
-                            Archive Incident
                         </Button>
                     </CardContent>
                 </Card>

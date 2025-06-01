@@ -52,3 +52,18 @@ export const createIncident = async (newIncident: NewIncident) => {
     const response = await api.post('/incidentreports', newIncident);
     return response.data
 }
+
+// Fetch all notifications for the logged-in user
+export const getNotifications = async () => {
+    const response = await api.get('/push/get-notifications')
+    return response.data
+}
+
+export const markAllNotificationsAsRead = async () => {
+    await api.post('/push/mark-all-read');
+};
+
+export const getUnreadNotifications = async () => {
+    const response = await api.get('/push/get-unread-notifications');
+    return response.data;
+};
