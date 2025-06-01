@@ -10,6 +10,7 @@ using SafetyChatbot.Application.Services;
 using SafetyChatbot.Domain.Models;
 using SafetyChatbot.Infrastructure.Repositories;
 using System.Security.Authentication;
+using SafetyChatbot.Api.Configurations;
 
 
 
@@ -34,7 +35,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IIncidentReportRepository, IncidentReportSqlRepository>();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerDocumentation();
 
 builder.Services.AddCors(options =>
 {
