@@ -10,7 +10,7 @@ import AdminDashboardPage from './pages/AdminPage';
 import IncidentDetailsPage from './pages/IncidentDetailsPage';
 import UnauthorizedPage from './pages/UnathorizedPage';
 import ProtectedRoute from './pages/ProtectedRoute';
-
+import ProfilePage from './pages/ProfilePage'
 import ChatPage from './pages/ChatPage';
 function App() {
     return (
@@ -40,6 +40,7 @@ function App() {
                         </ProtectedRoute>} />
 
                     <Route path="/admin/:id" element={<IncidentDetailsPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
 
                 </Routes>
             </Router>
