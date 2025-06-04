@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SafetyChatbot.Application\SafetyChatbot.Application.csproj" />
-    <ProjectReference Include="..\SafetyChatbot.Domain\SafetyChatbot.Domain.csproj" />
+   
   </ItemGroup>
 
 </Project>

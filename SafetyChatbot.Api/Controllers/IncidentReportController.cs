@@ -7,7 +7,7 @@ using SafetyChatbot.Application;
 using SafetyChatbot.Application.Dtos;
 using SafetyChatbot.Application.Services;
 using SafetyChatbot.Domain.Models;
-using SafetyChatbot.Infrastructure;
+using SafetyChatbot.Domain;
 using SafetyChatbot.Infrastructure.Repositories;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
