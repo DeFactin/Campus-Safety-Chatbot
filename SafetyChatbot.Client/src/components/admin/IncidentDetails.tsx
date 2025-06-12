@@ -420,6 +420,22 @@ const IncidentDetails: React.FC = () => {
                         <Button variant="outlined" fullWidth sx={{ mb: 2 }} onClick={handlePrintReport}>
                             Print Report
                         </Button>
+                        {incident.filePath && incident.filePath.trim() !== "" && (
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                sx={{ mb: 2 }}
+                                color="primary"
+                                onClick={() => {
+                                    const fileName = incident.filePath.split(/[\\/]/).pop();
+                                    const url = `https://localhost:7084/api/incidentreports/view/${fileName}`;
+                                    window.open(url, '_blank');
+                                }}
+                            >
+                                Open Evidence File
+                            </Button>
+                        )}
+
                     </CardContent>
                 </Card>
             </Box>

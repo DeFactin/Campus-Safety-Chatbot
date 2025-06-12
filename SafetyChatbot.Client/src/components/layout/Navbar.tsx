@@ -5,7 +5,7 @@ import {
     Avatar, Chip, Divider, Menu, MenuItem
 } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import {X, LogOut } from 'lucide-react';
+import {X, LogOut, MenuIcon } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import {
@@ -201,7 +201,13 @@ const Navbar: React.FC = () => {
             <Box sx={{ p: 3 }}>
                 {username ? (
                     <>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Box
+                            sx={{ display: 'flex', alignItems: 'center', mb: 2, cursor: 'pointer' }}
+                            onClick={() => {
+                                navigate('/profile');
+                                setMobileOpen(false);
+                            }}
+                        >
                             <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
                                 {username.charAt(0).toUpperCase()}
                             </Avatar>
@@ -212,6 +218,7 @@ const Navbar: React.FC = () => {
                                 </Typography>
                             </Box>
                         </Box>
+
                         <IconButton
                             color={hasPermission ? "primary" : "default"}
                             onClick={handleNotificationClick}
@@ -319,25 +326,28 @@ const Navbar: React.FC = () => {
                                 {username ? (
                                     <>
                                         <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 40 }} />
-                                        <Chip
-                                            avatar={
-                                                <Avatar sx={{ bgcolor: 'warning.main' }}>
-                                                    {username.charAt(0).toUpperCase()}
-                                                </Avatar>
-                                            }
-                                            label={
-                                                <Box>
-                                                    <Typography variant="subtitle2">{username}</Typography>
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        {role}
-                                                    </Typography>
-                                                </Box>
-                                            }
-                                            sx={{
-                                                backgroundColor: 'white',
-                                                '.MuiChip-label': { pr: 1 }
-                                            }}
-                                        />
+                                            <Chip
+                                                avatar={
+                                                    <Avatar sx={{ bgcolor: 'warning.main' }}>
+                                                        {username.charAt(0).toUpperCase()}
+                                                    </Avatar>
+                                                }
+                                                label={
+                                                    <Box>
+                                                        <Typography variant="subtitle2">{username}</Typography>
+                                                        <Typography variant="caption" color="text.secondary">
+                                                            {role}
+                                                        </Typography>
+                                                    </Box>
+                                                }
+                                                sx={{
+                                                    backgroundColor: 'white',
+                                                    '.MuiChip-label': { pr: 1 },
+                                                    cursor: 'pointer'
+                                                }}
+                                                onClick={() => navigate('/profile')}
+                                            />
+
                                         <IconButton
                                             color={hasPermission ? "primary" : "default"}
                                             onClick={(e) => {

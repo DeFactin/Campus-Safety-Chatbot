@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using FirebaseAdmin.Messaging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using SafetyChatbot.Application;
 using SafetyChatbot.Application.Dtos;
@@ -9,9 +11,8 @@ using SafetyChatbot.Application.Services;
 using SafetyChatbot.Domain.Models;
 using SafetyChatbot.Infrastructure;
 using SafetyChatbot.Infrastructure.Repositories;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace SafetyChatbot.Api.Controllers
 {
@@ -19,8 +20,8 @@ namespace SafetyChatbot.Api.Controllers
 
     [ApiController]
     [Route("api/incidentreports")]
-    
-    public class IncidentReportController: ControllerBase
+
+    public class IncidentReportController : ControllerBase
     {
         private readonly IIncidentReportRepository _incidentReportRepository;
         private readonly IMapper _mapper;
@@ -30,7 +31,7 @@ namespace SafetyChatbot.Api.Controllers
         public IncidentReportController(
             IIncidentReportRepository IncidentReportRepository,
             IMapper mapper,
-            ApplicationDbContext context )
+            ApplicationDbContext context)
         {
             _incidentReportRepository = IncidentReportRepository;
             _mapper = mapper;
@@ -70,7 +71,7 @@ namespace SafetyChatbot.Api.Controllers
                     return BadRequest("Invalid data.");
                 }
 
-               
+
                 string? savedFilePath = null;
                 if (dto.File != null && dto.File.Length > 0)
                 {
@@ -200,16 +201,57 @@ namespace SafetyChatbot.Api.Controllers
             return Ok(resultDto);
         }
 
-    
-    
-    [Authorize(Roles = "Admin")]
+
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-         
+
             _incidentReportRepository.Delete(id);
             return NoContent();
         }
+
+
+        [Authorize]
+        [HttpGet("user-incidents")]
+        public async Task<ActionResult<IEnumerable<IncidentReport>>> GetUserIncidents()
+        {
+            var userId = User.FindFirst("preferred_username")?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            return await _context.IncidentReports
+                .Where(i => i.ReportedBy == userId)
+                .OrderByDescending(i => i.ReportedBy)
+                .ToListAsync();
+        }
+
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("view/{fileName}")]
+        public IActionResult ViewFile(string fileName)
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filePath, out var contentType))
+            {
+                contentType = "application/octet-stream";
+            }
+
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            // Content-Disposition: inline - znači da preglednik pokušava prikazati fajl
+            return File(fileBytes, contentType);
+        }
+
+
 
     }
 }

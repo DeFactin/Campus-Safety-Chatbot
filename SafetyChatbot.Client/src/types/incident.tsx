@@ -14,5 +14,6 @@ export interface Incident {
     reportedAt?: string;
     lastUpdated?: string;
     adminNotes?: string;
+    filePath?: string; // optional, in case it's null or undefined
     
 }

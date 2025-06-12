@@ -67,3 +67,8 @@ export const getUnreadNotifications = async () => {
     const response = await api.get('/push/get-unread-notifications');
     return response.data;
 };
+
+export const getUserIncidents = async () => {
+    const response = await api.get('incidentreports/user-incidents')
+    return response.data
+}
