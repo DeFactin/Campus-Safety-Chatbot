@@ -5,7 +5,7 @@ import {
     Avatar, Chip, Divider, Menu, MenuItem
 } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import {X, LogOut } from 'lucide-react';
+import {X, LogOut, MenuIcon } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
 import Cookies from 'js-cookie';
 import {

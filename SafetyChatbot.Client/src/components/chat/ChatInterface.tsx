@@ -63,9 +63,15 @@ const ChatInterface: React.FC = () => {
     const [input, setInput] = useState('');
     const sessionId = useRef<string>(uuidv4());
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTo({
+                top: messagesContainerRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
     };
 
     useEffect(() => {
@@ -187,7 +193,7 @@ const ChatInterface: React.FC = () => {
                     boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                     overflow: 'hidden'
                 }}>
-                    <Box sx={{ flex: 1, overflowY: 'auto', p: 3, bgcolor: 'background.default' }}>
+                    <Box ref={messagesContainerRef} sx={{ flex: 1, overflowY: 'auto', p: 3, bgcolor: 'background.default' }}>
                         {messages.map((message) => (
                             <ChatMessage key={message.id} message={message} username={username} />
                         ))}
